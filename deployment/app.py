@@ -89,7 +89,7 @@ def main():
         st.subheader("Add your face to database")
 
         image = st.camera_input("Take a picture")
-
+        image = Image.open(image)
         if image is not None:
             user_name = st.text_input("Enter your name:")
             user_dob = st.text_input("Enter your date of birth (dd/mm/yyyy):")
@@ -101,10 +101,10 @@ def main():
                 os.mkdir(user_folder)
             new_upload_path = os.path.join(user_folder, time.strftime("%Y%m%d%H%M%S.jpg"))
             # cv2.imwrite(new_upload_path, cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR))
+            print(image)
             cv2.imwrite(new_upload_path, np.asarray(image))
-
             st.text("Target Image")
-            st.image(image)
+            # st.image(image)
 
 
     if choice == 'Verify':
