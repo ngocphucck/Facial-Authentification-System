@@ -71,7 +71,21 @@ def main():
     activities = ["Upload", "Verify", "About"]
     choice = st.sidebar.selectbox("Select Activity", activities)
 
-    if choice == 'Upload':
+    if choice == 'About':
+        st.subheader("Face Authentication App")
+        st.markdown(
+            "Built with Streamlit by [Max](https://github.com/manhph2211). The web appplication allows to add user to database and verfify them later. Also, we provide solutions for face anti-spoofing and face sentiment analysis ...")
+        st.subheader("Team members:")
+        members = ''' 
+            Pham Hung Manh\n
+            Doan Ngoc Phu\n
+            Do Van Dai\n
+            Ha Bao Anh\n
+            Nguyen Xuan Hoang\n'''
+        st.markdown(members)
+        st.success("Max Ph")
+
+    elif choice == 'Upload':
         st.subheader("Add your face to database")
 
         image = st.camera_input("Take a picture")
@@ -173,19 +187,6 @@ def main():
                 st.success("Found {} faces and {} eyes".format(
                     len(result_faces), len(result_eyes)))
 
-    elif choice == 'About':
-        st.subheader("Face Authentication App")
-        st.markdown(
-            "Built with Streamlit by [Max](https://github.com/manhph2211). The web appplication allows to add user to database and verfify them later. Also, we provide solutions for face anti-spoofing and face sentiment analysis ...")
-        st.subheader("Team members:")
-        members = '''
-            Pham Hung Manh\n
-            Doan Ngoc Phu\n
-            Do Van Dai\n
-            Ha Bao Anh\n
-            Nguyen Xuan Hoang\n'''
-        st.markdown(members)
-        st.success("Max Ph")
 
 
 if __name__ == '__main__':
