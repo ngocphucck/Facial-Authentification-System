@@ -87,24 +87,20 @@ def main():
 
     elif choice == 'Upload':
         st.subheader("Add your face to database")
-
+        user_name = st.text_input("Enter your name:")
+        user_dob = st.text_input("Enter your date of birth (dd/mm/yyyy):")
+        user_code = st.text_input("Enter your code:")
         image = st.camera_input("Take a picture")
-        image = Image.open(image)
         if image is not None:
-            user_name = st.text_input("Enter your name:")
-            user_dob = st.text_input("Enter your date of birth (dd/mm/yyyy):")
-            user_code = st.text_input("Enter your code:")
+            image = Image.open(image)
             user_counts = len(next(os.walk('deployment/assets/target_imgs'))[1])
             print(f"There are {user_counts} users so far!!!")
             user_folder = os.path.join("deployment/assets/target_imgs",user_code)
             if not os.path.isdir(user_folder):
                 os.mkdir(user_folder)
             new_upload_path = os.path.join(user_folder, time.strftime("%Y%m%d%H%M%S.jpg"))
-            # cv2.imwrite(new_upload_path, cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR))
-            print(image)
-            cv2.imwrite(new_upload_path, np.asarray(image))
-            st.text("Target Image")
-            # st.image(image)
+            cv2.imwrite(new_upload_path, cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR))
+
 
 
     if choice == 'Verify':
