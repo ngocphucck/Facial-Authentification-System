@@ -11,7 +11,7 @@ This project aims to build a streamlit app which includes face detection, face r
 
 ## Environments
 
-# Tools
+# Usage
 
 # Demo
 
