@@ -4,13 +4,14 @@ import cv2
 from PIL import Image, ImageEnhance
 import numpy as np
 import os
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import time
 import json
 import sys
 sys.path.append(".")
 from face_detection.predict import predict as detect
 from image_enhacement.tools.predict import predict as enhance
-from face_alignment.alignment import align_image
+from image_alignment.alignment import align_image
 
 
 @st.cache
