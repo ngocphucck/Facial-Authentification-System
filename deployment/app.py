@@ -96,7 +96,7 @@ def main():
                 "name": user_name,
                 "user_code": user_code,
                 "user_dob": user_dob,
-                "img_num": len([name for name in os.listdir(f'deployment/assets/target_imgs/{user_code}') if os.path.isfile(name) and name.endswith("jpg")])
+                "img_num": len([name for name in os.listdir(f'deployment/assets/target_imgs/{user_code}') if name.endswith("jpg")])
             }
             with open(user_info_path,'w') as f:
                 json.dump(user_info, f, indent=2)
