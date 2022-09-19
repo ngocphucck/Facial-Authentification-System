@@ -22,10 +22,9 @@ def alignment(cv_img, dst):
     return face_img
 
 
-def align_image(image_path):
-    fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D,
-     flip_input=False, device='cpu')
-    image_path = '../data/demo/detection/1.jpg'
+def align_image(image_path, demo=False):
+    fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device='cpu')
+    # image_path = 'data/demo/detection/1.jpg'
     image = cv2.imread(image_path)
 
     landmarks = fa.get_landmarks(image)
@@ -47,8 +46,9 @@ def align_image(image_path):
 
         face = alignment(cv_img, dst)
     
-    cv2.imwrite('../data/demo/alignment/' + image_path.split('/')[-1], face)
-
+    cv2.imwrite('data/demo/alignment/' + image_path.split('/')[-1], face)
+    if demo:
+        cv2.imwrite(image_path, face)
 
 if __name__ == '__main__':
     align_image('../data/demo/detection/1.jpg')

@@ -10,6 +10,8 @@ import sys
 sys.path.append(".")
 from face_detection.predict import predict as detect
 from image_enhacement.tools.predict import predict as enhance
+from face_alignment.alignment import align_image
+
 
 @st.cache
 def load_image(img):
@@ -96,6 +98,7 @@ def main():
             new_upload_path = os.path.join(user_folder, time.strftime("%Y%m%d%H%M%S.jpg"))
             cv2.imwrite(new_upload_path, cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR))
             enhance(new_upload_path)
+            align_image(new_upload_path, demo=True)
             user_info_path = os.path.join(user_folder, f"{user_code}.json")
             user_info = {
                 "name": user_name,
