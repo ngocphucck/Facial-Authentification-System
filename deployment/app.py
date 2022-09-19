@@ -147,8 +147,9 @@ def main():
         if st.button("Process"):
             with st.spinner(text="🤖 Recognizing..."):
                 data = verify()
-                time.sleep(1)
+                time.sleep(0.1)
                 st.write(data)
+                st.balloons()
 
 
 if __name__ == '__main__':
