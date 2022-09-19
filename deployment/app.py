@@ -68,7 +68,7 @@ def main():
     if choice == 'About':
         st.subheader("Face Authentication App")
         st.markdown(
-            "Built with Streamlit by [Max](https://github.com/manhph2211). The web appplication allows to add user to database and verfify them later. Also, we provide solutions for face anti-spoofing and face sentiment analysis ...")
+            "Built with Streamlit by [Manh Pham](https://github.com/manhph2211). The web appplication allows to add user to database and verfify them later. Also, we provide solutions for face anti-spoofing and face sentiment analysis ...")
         st.subheader("Team members:")
         members = ''' 
             Pham Hung Manh\n
@@ -106,14 +106,14 @@ def main():
             with open(user_info_path,'w') as f:
                 json.dump(user_info, f, indent=2)
 
-    if choice == 'Verify':
-        st.subheader("Face Verification")
+    if choice == 'Identify':
+        st.subheader("Face Identification")
         image = st.camera_input("Take a picture")
         if image is not None:
             image = Image.open(image)
 
             enhance_type = st.sidebar.radio(
-                "Enhance Type", ["Original", "Gray-Scale", "Contrast", "Brightness", "Blurring"])
+                "Augmentation", ["Original", "Gray-Scale", "Contrast", "Brightness", "Blurring"])
                 
             if enhance_type == 'Gray-Scale':
                 new_img = np.array(image.convert('RGB'))
@@ -145,8 +145,9 @@ def main():
                 result = image
 
         if st.button("Process"):
-            with st.spinner(text="This may take a moment..."):
+            with st.spinner(text="🤖 Recognizing..."):
                 data = verify()
+                time.sleep(1)
                 st.write(data)
 
 
