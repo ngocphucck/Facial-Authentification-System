@@ -35,8 +35,9 @@ def predict(file_path):
         # Save image
     sr_image = imgproc.tensor_to_image(sr_tensor, False, False)
     sr_image = cv2.cvtColor(sr_image, cv2.COLOR_RGB2BGR)
-    name = file_path.split("/")[-1]
-    cv2.imwrite(os.path.join("data/demo/enhancement/", name), sr_image)
+    # name = file_path.split("/")[-1]
+    # cv2.imwrite(os.path.join("data/demo/enhancement/", name), sr_image)
+    cv2.imwrite(file_path, sr_image)
 
 if __name__ == "__main__":
     predict("data/demo/detection/1.jpg")

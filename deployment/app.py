@@ -8,8 +8,8 @@ import time
 import json
 import sys
 sys.path.append(".")
-from face_detection.predict import predict
-
+from face_detection.predict import predict as detect
+from image_enhacement.tools.predict import predict as enhance
 
 @st.cache
 def load_image(img):
@@ -21,7 +21,7 @@ def detect_faces(image_path):
     # image = load_image(image_path)
     # image = np.array(image.convert('RGB'))
     # image = cv2.cvtColor(image, 1)
-    face = predict(image_path)
+    face = detect(image_path)
     # path_to_face = f"data/demo/detection/{name}"
     return face[0]
 
@@ -95,7 +95,7 @@ def main():
                 os.mkdir(user_folder)
             new_upload_path = os.path.join(user_folder, time.strftime("%Y%m%d%H%M%S.jpg"))
             cv2.imwrite(new_upload_path, cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR))
-
+            enhance(new_upload_path)
             user_info_path = os.path.join(user_folder, f"{user_code}.json")
             user_info = {
                 "name": user_name,
