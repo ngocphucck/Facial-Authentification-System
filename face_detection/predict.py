@@ -1,0 +1,47 @@
+import cv2
+import os
+import numpy as np
+from matplotlib import pyplot as plt
+import torch
+from torch.autograd import Variable
+from ssd import build_ssd
+from utils import BaseTransform
+import warnings
+warnings.filterwarnings("ignore")
+
+
+def predict(image, save_folder='../data/demo/detection'):
+    trained_model_path = 'weights/ssd300_FACE_18000.pth'
+    num_classes = 1 + 1  # +1 background
+    net = build_ssd('test', 300, num_classes)  # initialize SSD
+    net.load_state_dict(torch.load(trained_model_path, map_location=torch.device('cpu')))
+    net.eval()
+
+    transform = BaseTransform(net.size, (104, 117, 123))
+
+    x = torch.from_numpy(transform(image)[0]).permute(2, 0, 1)
+    x = Variable(x.unsqueeze(0))
+    y = net(x)
+    dets = y.data
+    faces = []
+    scale = torch.Tensor([
+        image.shape[1], image.shape[0],
+        image.shape[1], image.shape[0]]
+    )
+
+    j = 0
+    while dets[0, 1, j, 0] >= 0.4:
+        score = dets[0, 1, j, 0]
+        box = [score.item()] + (dets[0, 1, j, 1:] * scale).cpu().numpy().tolist()
+        j += 1
+
+        cut_image = image[int(box[2]): int(box[4]), int(box[1]): int(box[3]), :]
+        cut_image_path = os.path.join(save_folder, str(j) + '.jpg')
+        faces.append(cut_image)
+
+        cv2.imwrite(cut_image_path, cut_image)
+
+    return faces
+
+if __name__ == '__main__':
+    pass

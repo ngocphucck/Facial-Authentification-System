@@ -6,6 +6,8 @@ import os
 import time
 import json
 
+from ..face_detection.predict import predict
+
 
 @st.cache
 def load_image(img):
@@ -16,9 +18,8 @@ def load_image(img):
 def detect_faces(our_image):
     new_img = np.array(our_image.convert('RGB'))
     img = cv2.cvtColor(new_img, 1)
-    gray = cv2.cvtColor(new_img, cv2.COLOR_BGR2GRAY)
     # Detect faces
-    faces = None
+    faces = predict(new_img)
     return img, faces
 
 
