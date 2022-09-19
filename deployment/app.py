@@ -1,3 +1,4 @@
+from distutils.log import debug
 import streamlit as st
 import cv2
 from PIL import Image, ImageEnhance
@@ -5,8 +6,9 @@ import numpy as np
 import os
 import time
 import json
-
-from ..face_detection.predict import predict
+import sys
+sys.path.append(".")
+from face_detection.predict import predict
 
 
 @st.cache
@@ -15,12 +17,13 @@ def load_image(img):
     return im
 
 
-def detect_faces(our_image):
-    new_img = np.array(our_image.convert('RGB'))
-    img = cv2.cvtColor(new_img, 1)
-    # Detect faces
-    faces = predict(new_img)
-    return img, faces
+def detect_faces(image_path):
+    # image = load_image(image_path)
+    # image = np.array(image.convert('RGB'))
+    # image = cv2.cvtColor(image, 1)
+    face = predict(image_path)
+    # path_to_face = f"data/demo/detection/{name}"
+    return face[0]
 
 
 def cartonize_image(our_image):
@@ -83,7 +86,8 @@ def main():
         user_code = st.text_input("Enter your code:")
         image = st.camera_input("Take a picture")
         if image is not None:
-            image = Image.open(image)
+            # image = Image.open(image)
+            image = detect_faces(image)
             user_counts = len(next(os.walk('deployment/assets/target_imgs'))[1])
             print(f"There are {user_counts} users so far!!!")
             user_folder = os.path.join("deployment/assets/target_imgs",user_code)

@@ -1,22 +1,26 @@
 import cv2
 import os
 import numpy as np
+from PIL import Image
 from matplotlib import pyplot as plt
 import torch
 from torch.autograd import Variable
-from ssd import build_ssd
-from utils import BaseTransform
+from face_detection.ssd import build_ssd
+from face_detection.utils import BaseTransform
 import warnings
 warnings.filterwarnings("ignore")
 
 
-def predict(image, save_folder='../data/demo/detection'):
-    trained_model_path = 'weights/ssd300_FACE_18000.pth'
-    num_classes = 1 + 1  # +1 background
-    net = build_ssd('test', 300, num_classes)  # initialize SSD
-    net.load_state_dict(torch.load(trained_model_path, map_location=torch.device('cpu')))
-    net.eval()
+trained_model_path = 'face_detection/weights/ssd300_FACE_18000.pth'
+num_classes = 1 + 1  # +1 background
+net = build_ssd('test', 300, num_classes)  # initialize SSD
+net.load_state_dict(torch.load(trained_model_path, map_location=torch.device('cpu')))
+net.eval()
 
+def predict(image_path, save_folder='data/demo/detection'):
+    image = Image.open(image_path)    
+    image = np.array(image.convert('RGB'))
+    image = cv2.cvtColor(image, 1)
     transform = BaseTransform(net.size, (104, 117, 123))
 
     x = torch.from_numpy(transform(image)[0]).permute(2, 0, 1)

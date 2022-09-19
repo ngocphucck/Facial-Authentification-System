@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
-from layers import PriorBox, L2Norm, Detect
+from face_detection.layers import PriorBox, L2Norm, Detect
 #from data import face_cfg
-from config import face_cfg
+from face_detection.config import face_cfg
 import os
 
 
