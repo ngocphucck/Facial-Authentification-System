@@ -65,7 +65,7 @@ def main():
     st.title("Face Verification App")
     st.text("Build with Streamlit & Deep learning algorithms")
 
-    activities = ["About", "Upload", "Verify"]
+    activities = ["About", "Upload", "Identify"]
     choice = st.sidebar.selectbox("Select Activity", activities)
 
     if choice == 'About':
