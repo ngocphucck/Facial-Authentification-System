@@ -18,9 +18,12 @@ net.load_state_dict(torch.load(trained_model_path, map_location=torch.device('cp
 net.eval()
 
 def predict(image_path, save_folder='data/demo/detection'):
-    image = Image.open(image_path)    
-    image = np.array(image.convert('RGB'))
-    image = cv2.cvtColor(image, 1)
+    if type(image_path) == str:
+        image = Image.open(image_path)    
+        image = np.array(image.convert('RGB'))
+        image = cv2.cvtColor(image, 1)
+    else:
+        image = image_path
     transform = BaseTransform(net.size, (104, 117, 123))
 
     x = torch.from_numpy(transform(image)[0]).permute(2, 0, 1)

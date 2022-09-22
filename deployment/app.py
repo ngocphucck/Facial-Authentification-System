@@ -7,6 +7,8 @@ import os
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import time
 import json
+from streamlit_webrtc import webrtc_streamer, RTCConfiguration
+import av
 import sys
 sys.path.append(".")
 from face_detection.predict import predict as detect
@@ -24,9 +26,9 @@ def detect_faces(image_path):
     # image = load_image(image_path)
     # image = np.array(image.convert('RGB'))
     # image = cv2.cvtColor(image, 1)
-    face = detect(image_path)
+    faces = detect(image_path)
     # path_to_face = f"data/demo/detection/{name}"
-    return face[0]
+    return faces
 
 
 def cartonize_image(our_image):
@@ -65,7 +67,7 @@ def main():
     st.title("Face Verification App")
     st.text("Build with Streamlit & Deep learning algorithms")
 
-    activities = ["About", "Upload", "Identify"]
+    activities = ["About", "Upload", "Recognition", "Realtime Webcam Recognition"]
     choice = st.sidebar.selectbox("Select Activity", activities)
 
     if choice == 'About':
@@ -90,7 +92,7 @@ def main():
         image = st.camera_input("Take a picture")
         if image is not None:
             # image = Image.open(image)
-            image = detect_faces(image)
+            image = detect_faces(image)[0]
             user_counts = len(next(os.walk('deployment/assets/target_imgs'))[1])
             print(f"There are {user_counts} users so far!!!")
             user_folder = os.path.join("deployment/assets/target_imgs",user_code)
@@ -110,7 +112,7 @@ def main():
             with open(user_info_path,'w') as f:
                 json.dump(user_info, f, indent=2)
 
-    if choice == 'Identify':
+    if choice == 'Recognition':
         st.subheader("Face Identification")
         image = st.camera_input("Take a picture")
         if image is not None:
@@ -154,6 +156,38 @@ def main():
                 time.sleep(0.1)
                 st.write(data)
                 st.balloons()
+
+    elif choice == "Realtime Webcam Recognition":
+
+        st.warning("NOTE : In order to use this mode, you need to give webcam access. "
+                "After clicking 'Start' , it takes about 10-20 seconds to ready the webcam.")
+
+        spinner_message = "Wait a sec, getting some things done..."
+
+        with st.spinner(spinner_message):
+
+            class VideoProcessor:
+
+                def recv(self, frame):
+                    # convert to numpy array
+                    frame = frame.to_ndarray(format="bgr24")
+                    # frame = cv2.cvtColor(frame, 1)
+                    # detect faces
+                    faces = detect(frame)
+                    
+                    # draw bounding boxes
+                    for x, y, w, h in faces:
+                        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
+
+                    frame = av.VideoFrame.from_ndarray(frame, format="bgr24")
+
+                    return frame
+
+
+            webrtc_streamer(key="key", video_processor_factory=VideoProcessor,
+                            rtc_configuration=RTCConfiguration(
+                                {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}))
+
 
 
 if __name__ == '__main__':
