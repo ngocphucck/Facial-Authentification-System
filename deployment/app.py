@@ -15,6 +15,7 @@ from face_detection.predict import predict as detect
 from image_enhacement.tools.predict import predict as enhance
 from image_alignment.alignment import align_image
 
+detector = cv2.CascadeClassifier('deployment/haarcascade_frontalface_default.xml')
 
 @st.cache
 def load_image(img):
@@ -159,10 +160,20 @@ def main():
 
     elif choice == "Realtime Webcam Recognition":
 
-        st.warning("NOTE : In order to use this mode, you need to give webcam access. "
-                "After clicking 'Start' , it takes about 10-20 seconds to ready the webcam.")
+        st.warning("NOTE : In order to use this mode, you need to give webcam access.")
 
         spinner_message = "Wait a sec, getting some things done..."
+        minimum_neighbors = st.slider("Mininum Neighbors", min_value=0, max_value=10,
+                                    help="Parameter specifying how many neighbors each candidate "
+                                        "rectangle should have to retain it. This parameter will affect "
+                                        "the quality of the detected faces. Higher value results in less "
+                                        "detections but with higher quality.",
+                                    value=4)
+
+        min_size = st.slider(f"Mininum Object Size, Eg-{(50, 50)} pixels ", min_value=3, max_value=500,
+                            help="Minimum possible object size. Objects smaller than that are ignored.",
+                            value=70)
+        min_object_size = (min_size, min_size)
 
         with st.spinner(spinner_message):
 
@@ -173,7 +184,9 @@ def main():
                     frame = frame.to_ndarray(format="bgr24")
                     # frame = cv2.cvtColor(frame, 1)
                     # detect faces
-                    faces = detect(frame)
+                    # faces = detect(frame, get_ax=True)
+
+                    faces = detector.detectMultiScale(frame, 1.1, minNeighbors=minimum_neighbors, minSize=min_object_size)
                     
                     # draw bounding boxes
                     for x, y, w, h in faces:
@@ -183,11 +196,9 @@ def main():
 
                     return frame
 
-
             webrtc_streamer(key="key", video_processor_factory=VideoProcessor,
                             rtc_configuration=RTCConfiguration(
                                 {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}))
-
 
 
 if __name__ == '__main__':

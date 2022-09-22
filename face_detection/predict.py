@@ -17,7 +17,7 @@ net = build_ssd('test', 300, num_classes)  # initialize SSD
 net.load_state_dict(torch.load(trained_model_path, map_location=torch.device('cpu')))
 net.eval()
 
-def predict(image_path, save_folder='data/demo/detection'):
+def predict(image_path, save_folder='data/demo/detection', get_ax = False):
     if type(image_path) == str:
         image = Image.open(image_path)    
         image = np.array(image.convert('RGB'))
@@ -31,6 +31,7 @@ def predict(image_path, save_folder='data/demo/detection'):
     y = net(x)
     dets = y.data
     faces = []
+    axes = []
     scale = torch.Tensor([
         image.shape[1], image.shape[0],
         image.shape[1], image.shape[0]]
@@ -41,13 +42,13 @@ def predict(image_path, save_folder='data/demo/detection'):
         score = dets[0, 1, j, 0]
         box = [score.item()] + (dets[0, 1, j, 1:] * scale).cpu().numpy().tolist()
         j += 1
-
         cut_image = image[int(box[2]): int(box[4]), int(box[1]): int(box[3]), :]
         cut_image_path = os.path.join(save_folder, str(j) + '.jpg')
         faces.append(cut_image)
-
+        axes.append([int(box[1]), int(box[2]), int(box[3])-int(box[1]), int(box[4])-int(box[2])])
         cv2.imwrite(cut_image_path, cut_image)
-
+    if get_ax:
+        return axes
     return faces
 
 if __name__ == '__main__':
