@@ -24,8 +24,9 @@ def predict(image_path, save_folder='data/demo/detection', get_ax = False):
         image = cv2.cvtColor(image, 1)
     else:
         image = image_path
-        image = np.array(image.convert('RGB'))
-        image = cv2.cvtColor(image, 1)
+        if type(image) != np.ndarray:
+            image = np.array(image.convert('RGB'))
+            image = cv2.cvtColor(image, 1)
         
     transform = BaseTransform(net.size, (104, 117, 123))
 
