@@ -24,6 +24,9 @@ def predict(image_path, save_folder='data/demo/detection', get_ax = False):
         image = cv2.cvtColor(image, 1)
     else:
         image = image_path
+        image = np.array(image.convert('RGB'))
+        image = cv2.cvtColor(image, 1)
+        
     transform = BaseTransform(net.size, (104, 117, 123))
 
     x = torch.from_numpy(transform(image)[0]).permute(2, 0, 1)
