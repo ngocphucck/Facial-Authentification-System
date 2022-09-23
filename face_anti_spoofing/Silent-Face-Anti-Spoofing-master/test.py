@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time : 20-6-9 下午3:06
-# @Author : zhuying
-# @Company : Minivision
-# @File : test.py
-# @Software : PyCharm
-
 import os
 import cv2
 import numpy as np
@@ -19,9 +12,7 @@ warnings.filterwarnings('ignore')
 
 
 SAMPLE_IMAGE_PATH = "./images/"
-print(SAMPLE_IMAGE_PATH)
 
-# 因为安卓端APK获取的视频流宽高比为3:4,为了与之一致，所以将宽高比限制为3:4
 def check_image(image):
     height, width, channel = image.shape
     if width/height != 3/4:
