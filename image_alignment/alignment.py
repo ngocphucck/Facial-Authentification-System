@@ -1,5 +1,7 @@
 import cv2
-import face_alignment
+import sys
+sys.path.append(".")
+import image_alignment.face_alignment as face_alignment
 import numpy as np
 from skimage import transform as trans
 
@@ -23,11 +25,12 @@ def alignment(cv_img, dst):
 
 
 def align_image(image_path, demo=False):
-    fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device='cpu')
-    # image_path = 'data/demo/detection/1.jpg'
+    fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, 
+                                      device='cpu')
     image = cv2.imread(image_path)
 
-    landmarks = fa.get_landmarks(image)
+    landmarks = fa.get_landmarks_from_image(image_path)
+    print(landmarks)
     points = landmarks[0]
     p1 = np.mean(points[36:42,:], axis=0)
     p2 = np.mean(points[42:48,:], axis=0)
@@ -51,5 +54,5 @@ def align_image(image_path, demo=False):
         cv2.imwrite(image_path, face)
 
 if __name__ == '__main__':
-    align_image('../data/demo/detection/1.jpg')
+    align_image('data/demo/detection/1.jpg')
     pass

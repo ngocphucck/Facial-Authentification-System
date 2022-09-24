@@ -5,7 +5,7 @@ from PIL import Image
 from matplotlib import pyplot as plt
 import torch
 from torch.autograd import Variable
-from face_detection.ssd import build_ssd
+from .models import build_ssd, YoloDetector
 from face_detection.utils import BaseTransform
 import warnings
 warnings.filterwarnings("ignore")
@@ -17,7 +17,9 @@ net = build_ssd('test', 300, num_classes)  # initialize SSD
 net.load_state_dict(torch.load(trained_model_path, map_location=torch.device('cpu')))
 net.eval()
 
-def predict(image_path, save_folder='data/demo/detection', get_ax = False):
+model = YoloDetector(target_size=720, gpu=-1, min_face=90)
+
+def ssd_predict(image_path, save_folder='data/demo/detection', get_ax=False):
     if type(image_path) == str:
         image = Image.open(image_path)    
         image = np.array(image.convert('RGB'))
@@ -51,5 +53,46 @@ def predict(image_path, save_folder='data/demo/detection', get_ax = False):
         return axes
     return faces
 
+
+def yoloface_predict(image_path, save_folder='data/demo/detection', get_ax=False):
+    if type(image_path) == str:
+        image = Image.open(image_path)    
+        image = np.array(image.convert('RGB'))
+        image = cv2.cvtColor(image, 1)
+    else:
+        image = image_path
+
+    x = torch.from_numpy(image).permute(2, 0, 1)
+    faces, points = model(image)
+    
+    cut_faces = []
+    j = 0
+    axes = []
+    for (xmin, ymin, xmax, ymax) in faces[0]:
+        x = xmin
+        y = ymin
+        w = xmax - xmin
+        h = ymax - ymin
+            
+        cut_image = image[y: y + h, x: x + w, :]
+        cut_faces.append(cut_image)
+        axes.append([x, y, w, h])
+        j += 1
+        cv2.imwrite(os.path.join(save_folder, str(j) + '.jpg'), cut_image)
+    
+    if get_ax:
+        return axes
+    
+    return cut_faces
+
+
+def predict(image_path, save_folder='data/demo/detection', get_ax=False, type='yoloface'):
+    if type == 'yoloface':
+        yoloface_predict(image_path, save_folder, get_ax)
+    elif type == 'ssd':
+        ssd_predict(image_path, save_folder, get_ax)
+
+
 if __name__ == '__main__':
+    predict('../data/demo/original/example.jpg', save_folder='../data/demo/detection', type='ssd')
     pass

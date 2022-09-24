@@ -182,12 +182,11 @@ def main():
                 def recv(self, frame):
                     # convert to numpy array
                     frame = frame.to_ndarray(format="bgr24")
-                    # frame = cv2.cvtColor(frame, 1)
+                    frame = cv2.cvtColor(frame, 1)
                     # detect faces
-                    # faces = detect(frame, get_ax=True)
+                    faces = detect(frame, get_ax=True, type='ssd')
+                    # faces = detector.detectMultiScale(frame, 1.1, minNeighbors=minimum_neighbors, minSize=min_object_size)
 
-                    faces = detector.detectMultiScale(frame, 1.1, minNeighbors=minimum_neighbors, minSize=min_object_size)
-                    
                     # draw bounding boxes
                     for x, y, w, h in faces:
                         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
