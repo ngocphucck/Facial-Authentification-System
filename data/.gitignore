@@ -2,3 +2,4 @@
 *.zip
 train/
 test/
+custom_data/
