@@ -26,6 +26,10 @@ def ssd_predict(image_path, save_folder='data/demo/detection', get_ax=False):
         image = cv2.cvtColor(image, 1)
     else:
         image = image_path
+        if type(image) != np.ndarray:
+            image = np.array(image.convert('RGB'))
+            image = cv2.cvtColor(image, 1)
+        
     transform = BaseTransform(net.size, (104, 117, 123))
 
     x = torch.from_numpy(transform(image)[0]).permute(2, 0, 1)

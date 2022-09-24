@@ -92,7 +92,7 @@ def main():
         user_code = st.text_input("Enter your code:")
         image = st.camera_input("Take a picture")
         if image is not None:
-            # image = Image.open(image)
+            image = Image.open(image)
             image = detect_faces(image)[0]
             user_counts = len(next(os.walk('deployment/assets/target_imgs'))[1])
             print(f"There are {user_counts} users so far!!!")
