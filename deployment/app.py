@@ -12,6 +12,7 @@ import av
 import sys
 sys.path.append(".")
 from face_detection.predict import predict as detect
+from face_detection.predict import ssd_predict, yoloface_predict
 from image_enhacement.tools.predict import predict as enhance
 from image_alignment.alignment import align_image
 
@@ -183,8 +184,10 @@ def main():
                     # convert to numpy array
                     frame = frame.to_ndarray(format="bgr24")
                     frame = cv2.cvtColor(frame, 1)
+
                     # detect faces
-                    faces = detect(frame, get_ax=True, type='ssd')
+                    faces = yoloface_predict(frame, get_ax=True)
+                    # faces = ssd_predict(frame, get_ax=True)
                     # faces = detector.detectMultiScale(frame, 1.1, minNeighbors=minimum_neighbors, minSize=min_object_size)
 
                     # draw bounding boxes

@@ -5,7 +5,7 @@ from PIL import Image
 from matplotlib import pyplot as plt
 import torch
 from torch.autograd import Variable
-from .models import build_ssd, YoloDetector
+from face_detection.models import build_ssd, YoloDetector
 from face_detection.utils import BaseTransform
 import warnings
 warnings.filterwarnings("ignore")
@@ -30,6 +30,7 @@ def ssd_predict(image_path, save_folder='data/demo/detection', get_ax=False):
             image = np.array(image.convert('RGB'))
             image = cv2.cvtColor(image, 1)
         
+    print(image)
     transform = BaseTransform(net.size, (104, 117, 123))
 
     x = torch.from_numpy(transform(image)[0]).permute(2, 0, 1)
@@ -53,6 +54,8 @@ def ssd_predict(image_path, save_folder='data/demo/detection', get_ax=False):
         faces.append(cut_image)
         axes.append([int(box[1]), int(box[2]), int(box[3])-int(box[1]), int(box[4])-int(box[2])])
         cv2.imwrite(cut_image_path, cut_image)
+
+    print(axes)
     if get_ax:
         return axes
     return faces
@@ -66,6 +69,7 @@ def yoloface_predict(image_path, save_folder='data/demo/detection', get_ax=False
     else:
         image = image_path
 
+    print(image)
     x = torch.from_numpy(image).permute(2, 0, 1)
     faces, points = model(image)
     
@@ -84,6 +88,7 @@ def yoloface_predict(image_path, save_folder='data/demo/detection', get_ax=False
         j += 1
         cv2.imwrite(os.path.join(save_folder, str(j) + '.jpg'), cut_image)
     
+    print(axes)
     if get_ax:
         return axes
     
@@ -98,5 +103,5 @@ def predict(image_path, save_folder='data/demo/detection', get_ax=False, type='y
 
 
 if __name__ == '__main__':
-    predict('../data/demo/original/example.jpg', save_folder='../data/demo/detection', type='ssd')
+    predict('test.jpg', save_folder='data/demo/detection', type='yoloface')
     pass
