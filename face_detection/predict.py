@@ -5,6 +5,9 @@ from PIL import Image
 from matplotlib import pyplot as plt
 import torch
 from torch.autograd import Variable
+import json
+import sys
+sys.path.append('.')
 from face_detection.models import build_ssd, YoloDetector
 from face_detection.utils import BaseTransform
 import warnings
@@ -55,7 +58,6 @@ def ssd_predict(image_path, save_folder='data/demo/detection', get_ax=False):
         axes.append([int(box[1]), int(box[2]), int(box[3])-int(box[1]), int(box[4])-int(box[2])])
         cv2.imwrite(cut_image_path, cut_image)
 
-    print(axes)
     if get_ax:
         return axes
     return faces
@@ -69,7 +71,6 @@ def yoloface_predict(image_path, save_folder='data/demo/detection', get_ax=False
     else:
         image = image_path
 
-    print(image)
     x = torch.from_numpy(image).permute(2, 0, 1)
     faces, points = model(image)
     
@@ -85,10 +86,15 @@ def yoloface_predict(image_path, save_folder='data/demo/detection', get_ax=False
         cut_image = image[y: y + h, x: x + w, :]
         cut_faces.append(cut_image)
         axes.append([x, y, w, h])
+
+        with open(os.path.join(save_folder, str(j + 1) + '.json'), 'w') as f:
+            for i in range(5):
+                points[0][j][i][0] -= x
+                points[0][j][i][1] -= y
+            json.dump(points[0][j], f)
         j += 1
         cv2.imwrite(os.path.join(save_folder, str(j) + '.jpg'), cut_image)
     
-    print(axes)
     if get_ax:
         return axes
     
@@ -103,5 +109,5 @@ def predict(image_path, save_folder='data/demo/detection', get_ax=False, type='y
 
 
 if __name__ == '__main__':
-    predict('test.jpg', save_folder='data/demo/detection', type='yoloface')
+    predict('data/demo/original/example.jpg', save_folder='data/demo/detection', type='yoloface')
     pass

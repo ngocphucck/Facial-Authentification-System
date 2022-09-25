@@ -1,12 +1,16 @@
 import cv2
+import numpy as np
+import os
+import json
 import sys
+import math
 sys.path.append(".")
 import image_alignment.face_alignment as face_alignment
 import numpy as np
 from skimage import transform as trans
 
 
-def alignment(cv_img, dst):
+def landmarks_alignment(cv_img, dst):
     dst_w = 224
     dst_h = 224
 
@@ -24,13 +28,36 @@ def alignment(cv_img, dst):
     return face_img
 
 
-def align_image(image_path, demo=False):
+def keypoints_alignment(image, eye_coors):
+    left_eye, right_eye = eye_coors
+    eye_center = ((left_eye[0] + right_eye[0]) // 2, (left_eye[1] + right_eye[1]) // 2)
+
+    # Calculate the angle between the eye points
+    dy = right_eye[1] - left_eye[1]
+    dx = right_eye[0] - left_eye[0]
+    angle = np.degrees(np.arctan2(dy, dx))
+
+    M = cv2.getRotationMatrix2D(eye_center, angle, 1)
+    (h, w) = int(math.sqrt(image.shape[0] ** 2 + image.shape[1] ** 2)), \
+             int(math.sqrt(image.shape[0] ** 2 + image.shape[1] ** 2))
+
+    image = cv2.circle(image, left_eye, 30, (255, 0, 0), 2)
+    image = cv2.circle(image, right_eye, 30, (255, 0, 0), 2)
+    cv2.imshow('a', image)
+    rotated_image = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC)
+    cv2.imshow('r', rotated_image)
+    cv2.waitKey(0)
+
+    return rotated_image
+
+
+def landmarks_align_image(image_path, demo=False):
     fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, 
                                       device='cpu')
     image = cv2.imread(image_path)
 
     landmarks = fa.get_landmarks_from_image(image_path)
-    print(landmarks)
+
     points = landmarks[0]
     p1 = np.mean(points[36:42,:], axis=0)
     p2 = np.mean(points[42:48,:], axis=0)
@@ -47,12 +74,33 @@ def align_image(image_path, demo=False):
         dst = np.array([p1,p2,p3,p4,p5],dtype=np.float32)
         cv_img = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-        face = alignment(cv_img, dst)
+        face = landmarks_alignment(cv_img, dst)
     
     cv2.imwrite('data/demo/alignment/' + image_path.split('/')[-1], face)
     if demo:
         cv2.imwrite(image_path, face)
 
+
+def keypoints_align_image(image_path, demo=False):
+    image = cv2.imread(image_path)
+    json_path = image_path.split('.')[0] + '.json'
+    with open(json_path, 'r') as f:
+        coors = json.load(f)
+
+    face = keypoints_alignment(image, (coors[0], coors[1]))
+    cv2.imwrite('data/demo/alignment/' + image_path.split('/')[-1], face)
+
+    if demo:
+        cv2.imwrite(image_path, face)
+
+
+def align_image(image_path, demo=False, t="keypoints"):
+    if t == "keypoints":
+        keypoints_align_image(image_path, demo)
+    else:
+        landmarks_align_image(image_path, demo)
+
+
 if __name__ == '__main__':
-    align_image('data/demo/detection/1.jpg')
+    keypoints_align_image('data/demo/detection/1.jpg')
     pass
