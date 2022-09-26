@@ -85,15 +85,14 @@ if __name__ == '__main__':
 
 
     #======= model & loss & optimizer =======#
-    BACKBONE_DICT = {'ResNet_50': ResNet_50(INPUT_SIZE), 
-                     'ResNet_101': ResNet_101(INPUT_SIZE), 
-                     'ResNet_152': ResNet_152(INPUT_SIZE),
+    BACKBONE_DICT = {
                      'IR_50': IR_50(INPUT_SIZE), 
                      'IR_101': IR_101(INPUT_SIZE), 
                      'IR_152': IR_152(INPUT_SIZE),
                      'IR_SE_50': IR_SE_50(INPUT_SIZE), 
                      'IR_SE_101': IR_SE_101(INPUT_SIZE), 
-                     'IR_SE_152': IR_SE_152(INPUT_SIZE)}
+                     'IR_SE_152': IR_SE_152(INPUT_SIZE)
+                     }
     BACKBONE = BACKBONE_DICT[BACKBONE_NAME]
     print("=" * 60)
     print(BACKBONE)
@@ -113,7 +112,6 @@ if __name__ == '__main__':
 
     LOSS_DICT = {'Focal': FocalLoss(), 
                  'Softmax': nn.CrossEntropyLoss(),
-                 'ArcFace' : ArcFace()
                  }
 
     LOSS = LOSS_DICT[LOSS_NAME]

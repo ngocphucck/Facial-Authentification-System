@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import Parameter
 import math
-
+import random
 
 # Support: ['Softmax', 'ArcFace', 'CosFace', 'SphereFace', 'Am_softmax']
 # Support: ['AdaCos','AdaM_Softmax','ArcFace','ArcNegFace','CircleLoss','CurricularFace','MagFace','NPCFace','MV_Softmax','SST_Prototype']
@@ -351,7 +351,7 @@ class AdaCos(nn.Module):
         output = self.scale * logits
         return output
 
-class AM_Softmax(Module):
+class AM_Softmax(nn.Module):
     """Implementation for "Additive Margin Softmax for Face Verification"
     """
     def __init__(self, feat_dim, num_class, margin=0.35, scale=32):
@@ -415,7 +415,7 @@ class ArcNegFace(nn.Module):
             t_scale[i]*=reweight.detach()
         return self.scale * (a_scale*a+c_scale*(t_scale*cos+t_scale-1))
 
-class CircleLoss(Module):
+class CircleLoss(nn.Module):
     """Implementation for "Circle Loss: A Unified Perspective of Pair Similarity Optimization"
     Note: this is the classification based implementation of circle loss.
     """
@@ -492,7 +492,7 @@ class CurricularFace(nn.Module):
         output = cos_theta * self.s
         return output
 
-class MagFace(Module):
+class MagFace(nn.Module):
     """Implementation for "ArcFace: Additive Angular Margin Loss for Deep Face Recognition"
     """
     def __init__(self, feat_dim, num_class, margin_am=0.0, scale=32, l_a=10, u_a=110, l_margin=0.45, u_margin=0.8, lamda=20):
@@ -535,7 +535,7 @@ class MagFace(Module):
         output *= self.scale
         return output, self.lamda*loss_g
 
-class MV_Softmax(Module):
+class MV_Softmax(nn.Module):
     """Implementation for "Mis-classified Vector Guided Softmax Loss for Face Recognition"
     """
     def __init__(self, feat_dim, num_class, is_am, margin=0.35, mv_weight=1.12, scale=32):
@@ -572,7 +572,7 @@ class MV_Softmax(Module):
         cos_theta *= self.scale
         return cos_theta
 
-class NPCFace(Module):
+class NPCFace(nn.Module):
     """Implementation for "NPCFace: A Negative-Positive Cooperation
        Supervision for Training Large-scale Face Recognition"
     """
@@ -618,7 +618,7 @@ class NPCFace(Module):
         cos_theta *= self.scale        
         return cos_theta
 
-class SST_Prototype(Module):
+class SST_Prototype(nn.Module):
     """Implementation for "Semi-Siamese Training for Shallow Face Learning".
     """
     def __init__(self, feat_dim=512, queue_size=16384, scale=30.0, loss_type='softmax', margin=0.0):
