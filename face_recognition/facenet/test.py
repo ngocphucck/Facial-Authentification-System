@@ -25,10 +25,9 @@ while True:
     if not ret:
         print("fail to grab frame, try again")
         break
-        
+
     img = Image.fromarray(frame)
     img_cropped_list, prob_list = mtcnn(img, return_prob=True) 
-    print(prob_list)
     
     if img_cropped_list is not None:
         boxes, _ = mtcnn.detect(img)
