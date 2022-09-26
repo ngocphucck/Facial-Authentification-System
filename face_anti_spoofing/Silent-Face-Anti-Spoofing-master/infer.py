@@ -26,7 +26,6 @@ def check_image(image):
 
 def test(image_name, model_dir, device_id):
     model_test = AntiSpoofPredict(device_id)
-    # image_cropper = CropImage()
     image = cv2.imread(SAMPLE_IMAGE_PATH + image_name)
     height, width, channel = image.shape
     print(image.shape)
@@ -39,29 +38,14 @@ def test(image_name, model_dir, device_id):
         # resize image
         img = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
 
-    # print cropped image shape
-    print(img.shape)
-
     result = check_image(img)
     if result is False:
         return
-    # image_bbox = model_test.get_bbox(image)
     prediction = np.zeros((1, 3))
     test_speed = 0
     # sum the prediction from single model's result
     for model_name in os.listdir(model_dir):
         h_input, w_input, model_type, scale = parse_model_name(model_name)
-        # param = {
-        #     "org_img": image,
-        #     "bbox": image_bbox,
-        #     "scale": scale,
-        #     "out_w": w_input,
-        #     "out_h": h_input,
-        #     "crop": True,
-        # }
-        # if scale is None:
-        #     param["crop"] = False
-        # img = image_cropper.crop(**param)
         dim = (80, 80)
         # resize image
         img_ = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
@@ -77,28 +61,22 @@ def test(image_name, model_dir, device_id):
         if value < 0.6:
             result_text = "Might be a fake face. Change your position for another authentification attempt"
             print(result_text)
-            color = (255, 0, 0)
         else:
             print("Image '{}' is Real Face. Score: {:.2f}.".format(image_name, value))
             result_text = "RealFace Score: {:.2f}".format(value)
-            color = (255, 0, 0)
 
     else:
         if value < 0.6:
             result_text = "Might be a fake face. However, you have to change your position for another authentification attempt"
             print(result_text)
-            color = (0, 0, 255)
         else:
             print("Image '{}' is Fake Face. Score: {:.2f}.".format(image_name, value))
             result_text = "FakeFace Score: {:.2f}".format(value)
-            color = (0, 0, 255)
     print("Prediction cost {:.2f} s".format(test_speed))
 
     format_ = os.path.splitext(image_name)[-1]
     result_image_name = image_name.replace(format_, "_result" + format_)
     cv2.imwrite(SAMPLE_IMAGE_PATH + result_image_name, image)
-
-
 
 
 test(image_name='phureal.jpg', model_dir="./resources/anti_spoof_models", device_id=0)
