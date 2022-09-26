@@ -3,9 +3,9 @@ import cv2
 import torch
 import sys
 sys.path.append('.')
-from image_enhacement.configs import config
-import image_enhacement.utils.utils as imgproc
-from image_enhacement.models.model import Generator
+from image_enhacement.srgan.configs import config
+import image_enhacement.srgan.utils.utils as imgproc
+from image_enhacement.srgan.models.model import Generator
 
 model = Generator().to(device=config.device, memory_format=torch.channels_last)
 # Load the super-resolution model weights

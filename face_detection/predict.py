@@ -7,6 +7,7 @@ import torch
 from torch.autograd import Variable
 import json
 import sys
+import time
 sys.path.append('.')
 from face_detection.models import build_ssd, YoloDetector
 from face_detection.utils import BaseTransform
@@ -33,7 +34,6 @@ def ssd_predict(image_path, save_folder='data/demo/detection', get_ax=False):
             image = np.array(image.convert('RGB'))
             image = cv2.cvtColor(image, 1)
         
-    print(image)
     transform = BaseTransform(net.size, (104, 117, 123))
 
     x = torch.from_numpy(transform(image)[0]).permute(2, 0, 1)
@@ -63,6 +63,7 @@ def ssd_predict(image_path, save_folder='data/demo/detection', get_ax=False):
     return faces
 
 
+times = []
 def yoloface_predict(image_path, save_folder='data/demo/detection', get_ax=False):
     if type(image_path) == str:
         image = Image.open(image_path)    
@@ -72,7 +73,10 @@ def yoloface_predict(image_path, save_folder='data/demo/detection', get_ax=False
         image = image_path
 
     x = torch.from_numpy(image).permute(2, 0, 1)
+    start = time.time()
     faces, points = model(image)
+    end = time.time()
+    times.append(end - start)
     
     cut_faces = []
     j = 0

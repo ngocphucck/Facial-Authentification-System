@@ -13,7 +13,7 @@ import sys
 sys.path.append(".")
 from face_detection.predict import predict as detect
 from face_detection.predict import ssd_predict, yoloface_predict
-from image_enhacement.tools.predict import predict as enhance
+from image_enhacement.srgan.tools.predict import predict as enhance
 from image_alignment.alignment import align_image
 
 detector = cv2.CascadeClassifier('deployment/haarcascade_frontalface_default.xml')
