@@ -15,12 +15,12 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-trained_model_path = 'face_detection/weights/ssd300_FACE_18000.pth'
-num_classes = 1 + 1  # +1 background
-net = build_ssd('test', 300, num_classes)  # initialize SSD
-net.load_state_dict(torch.load(trained_model_path, map_location=torch.device('cpu')))
-net.eval()
-
+# trained_model_path = 'face_detection/weights/ssd300_FACE_18000.pth'
+# num_classes = 1 + 1  # +1 background
+# net = build_ssd('test', 300, num_classes)  # initialize SSD
+# net.load_state_dict(torch.load(trained_model_path, map_location=torch.device('cpu')))
+# net.eval()
+net = None
 model = YoloDetector(target_size=720, gpu=-1, min_face=90)
 
 def ssd_predict(image_path, save_folder='data/demo/detection', get_ax=False):
@@ -69,12 +69,13 @@ def yoloface_predict(image_path, save_folder='data/demo/detection', get_ax=False
         image = np.array(image.convert('RGB'))
         image = cv2.cvtColor(image, 1)
     else:
-        image = np.array(image_path.convert('RGB'))
+        image = image_path
+        if type(image) != np.ndarray:
+            image = np.array(image.convert('RGB'))
         image = cv2.cvtColor(image, 1)
 
     x = torch.from_numpy(image).permute(2, 0, 1)
     faces, points = model(image)
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     
     cut_faces = []
     list_points = []

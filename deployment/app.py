@@ -105,7 +105,8 @@ def main():
             cv2.imwrite(new_upload_path, cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR))
             enhance(new_upload_path)
             align_image(new_upload_path, points, demo=True)
-            user_info_path = os.path.join(user_folder, f"{user_code}.json")
+            user_info_path = os.path.join(user_folder.replace(f"target_imgs\{user_code}", "info"), f"{user_code}.json")
+            print(user_info_path)
             user_info = {
                 "name": user_name,
                 "user_code": user_code,
