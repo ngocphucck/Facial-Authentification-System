@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time : 20-6-3 下午5:39
-# @Author : zhuying
-# @Company : Minivision
-# @File : train.py
-# @Software : PyCharm
-
 import argparse
 import os
 from src.train_main import TrainMain

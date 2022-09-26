@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time : 20-6-9 下午3:06
-# @Author : zhuying
-# @Company : Minivision
-# @File : test.py
-# @Software : PyCharm
-
 import os
 import cv2
 import numpy as np
@@ -19,7 +12,6 @@ warnings.filterwarnings('ignore')
 
 
 SAMPLE_IMAGE_PATH = "./images/"
-print(SAMPLE_IMAGE_PATH)
 
 def check_image(image):
     height, width, channel = image.shape
@@ -40,6 +32,7 @@ def test(image_name, model_dir, device_id):
     image_bbox = model_test.get_bbox(image)
     prediction = np.zeros((1, 3))
     test_speed = 0
+    print(image.shape)
     # sum the prediction from single model's result
     for model_name in os.listdir(model_dir):
         h_input, w_input, model_type, scale = parse_model_name(model_name)
@@ -57,6 +50,10 @@ def test(image_name, model_dir, device_id):
         start = time.time()
         prediction += model_test.predict(img, os.path.join(model_dir, model_name))
         test_speed += time.time()-start
+
+    # print cropped image shape
+    print(img.shape)
+
 
     # draw result of prediction
     label = np.argmax(prediction)
