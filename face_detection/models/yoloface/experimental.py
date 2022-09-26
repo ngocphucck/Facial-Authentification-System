@@ -4,9 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from .common import Conv, DWConv
-import sys
-sys.path.append('../..')
+from face_detection.models.yoloface.common import Conv, DWConv
 from face_detection.utils.google_utils import attempt_download
 
 

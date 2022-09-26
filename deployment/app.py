@@ -28,7 +28,7 @@ def detect_faces(image_path):
     # image = load_image(image_path)
     # image = np.array(image.convert('RGB'))
     # image = cv2.cvtColor(image, 1)
-    faces = detect(image_path)
+    faces = yoloface_predict(image_path)
     # path_to_face = f"data/demo/detection/{name}"
     return faces
 
@@ -94,7 +94,8 @@ def main():
         image = st.camera_input("Take a picture")
         if image is not None:
             image = Image.open(image)
-            image = detect_faces(image)[0]
+            image, points = detect_faces(image)
+            image, points = image[0], points[0]
             user_counts = len(next(os.walk('deployment/assets/target_imgs'))[1])
             print(f"There are {user_counts} users so far!!!")
             user_folder = os.path.join("deployment/assets/target_imgs",user_code)
@@ -103,7 +104,7 @@ def main():
             new_upload_path = os.path.join(user_folder, time.strftime("%Y%m%d%H%M%S.jpg"))
             cv2.imwrite(new_upload_path, cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR))
             enhance(new_upload_path)
-            align_image(new_upload_path, demo=True)
+            align_image(new_upload_path, points, demo=True)
             user_info_path = os.path.join(user_folder, f"{user_code}.json")
             user_info = {
                 "name": user_name,

@@ -11,8 +11,8 @@ import torch.nn as nn
 sys.path.append('./')  # to run '$ python *.py' files in subdirectories
 logger = logging.getLogger(__name__)
 
-from .common import Conv, Bottleneck, SPP, DWConv, Focus, BottleneckCSP, C3, ShuffleV2Block, Concat, NMS, autoShape, StemBlock
-from .experimental import MixConv2d, CrossConv
+from face_detection.models.yoloface.common import Conv, Bottleneck, SPP, DWConv, Focus, BottleneckCSP, C3, ShuffleV2Block, Concat, NMS, autoShape, StemBlock
+from face_detection.models.yoloface.experimental import MixConv2d, CrossConv
 from face_detection.utils.autoanchor import check_anchor_order
 from face_detection.utils.general import make_divisible, check_file, set_logging
 from face_detection.utils.torch_utils import time_synchronized, fuse_conv_and_bn, model_info, scale_img, initialize_weights, \

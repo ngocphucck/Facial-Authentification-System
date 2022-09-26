@@ -6,8 +6,8 @@ from matplotlib import pyplot as plt
 import torch
 from torch.autograd import Variable
 import json
+
 import sys
-import time
 sys.path.append('.')
 from face_detection.models import build_ssd, YoloDetector
 from face_detection.utils import BaseTransform
@@ -63,22 +63,21 @@ def ssd_predict(image_path, save_folder='data/demo/detection', get_ax=False):
     return faces
 
 
-times = []
 def yoloface_predict(image_path, save_folder='data/demo/detection', get_ax=False):
     if type(image_path) == str:
         image = Image.open(image_path)    
         image = np.array(image.convert('RGB'))
         image = cv2.cvtColor(image, 1)
     else:
-        image = image_path
+        image = np.array(image_path.convert('RGB'))
+        image = cv2.cvtColor(image, 1)
 
     x = torch.from_numpy(image).permute(2, 0, 1)
-    start = time.time()
     faces, points = model(image)
-    end = time.time()
-    times.append(end - start)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     
     cut_faces = []
+    list_points = []
     j = 0
     axes = []
     for (xmin, ymin, xmax, ymax) in faces[0]:
@@ -91,18 +90,17 @@ def yoloface_predict(image_path, save_folder='data/demo/detection', get_ax=False
         cut_faces.append(cut_image)
         axes.append([x, y, w, h])
 
-        with open(os.path.join(save_folder, str(j + 1) + '.json'), 'w') as f:
-            for i in range(5):
-                points[0][j][i][0] -= x
-                points[0][j][i][1] -= y
-            json.dump(points[0][j], f)
+        for i in range(5):
+            points[0][j][i][0] -= x
+            points[0][j][i][1] -= y
+        list_points.append(points[0][j])
         j += 1
         cv2.imwrite(os.path.join(save_folder, str(j) + '.jpg'), cut_image)
     
     if get_ax:
         return axes
     
-    return cut_faces
+    return cut_faces, list_points
 
 
 def predict(image_path, save_folder='data/demo/detection', get_ax=False, type='yoloface'):
