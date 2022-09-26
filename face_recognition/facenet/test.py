@@ -57,25 +57,6 @@ while True:
 
     cv2.imshow("IMG", frame)
         
-    
-    k = cv2.waitKey(1)
-    if k%256==27: # ESC
-        print('Esc pressed, closing...')
-        break
-        
-    elif k%256==32: # space to save image
-        print('Enter your name :')
-        name = input()
-        
-        # create directory if not exists
-        if not os.path.exists('photos/'+name):
-            os.mkdir('photos/'+name)
-            
-        img_name = "photos/{}/{}.jpg".format(name, int(time.time()))
-        cv2.imwrite(img_name, original_frame)
-        print(" saved: {}".format(img_name))
-        
-        
 cam.release()
 cv2.destroyAllWindows()
     
