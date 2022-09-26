@@ -3,3 +3,4 @@
 train/
 test/
 custom_data/
+*.pt
