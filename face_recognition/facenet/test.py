@@ -3,7 +3,8 @@ import time
 from facenet_pytorch import MTCNN, InceptionResnetV1
 import torch
 
-import os
+import sys
+sys.path.append(".")
 from PIL import Image
 
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to('cpu')
@@ -12,7 +13,7 @@ mtcnn = MTCNN(
     thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
     device='cpu'
 )
-load_data = torch.load('data.pt') 
+load_data = torch.load('deployment/assets/embeddings.pt') 
 embedding_list = load_data[0] 
 name_list = load_data[1] 
 
@@ -56,6 +57,10 @@ while True:
                 frame = cv2.rectangle(frame, (int(box[0]),int(box[1])) , (int(box[2]),int(box[3])), (255,0,0), 2)
 
     cv2.imshow("IMG", frame)
+    k = cv2.waitKey(1)
+    if k%256==27: # ESC
+        print('Esc pressed, closing...')
+        break
         
 cam.release()
 cv2.destroyAllWindows()
