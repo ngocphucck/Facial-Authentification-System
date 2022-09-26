@@ -78,5 +78,4 @@ def test(image_name, model_dir, device_id):
     result_image_name = image_name.replace(format_, "_result" + format_)
     cv2.imwrite(SAMPLE_IMAGE_PATH + result_image_name, image)
 
-
 test(image_name='phureal.jpg', model_dir="./resources/anti_spoof_models", device_id=0)
