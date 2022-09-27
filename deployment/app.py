@@ -15,8 +15,20 @@ from face_detection.predict import predict as detect
 from face_detection.predict import ssd_predict, yoloface_predict
 from image_enhacement.srgan.tools.predict import predict as enhance
 from image_alignment.alignment import align_image
+from face_recognition.facenet.test import *
 
-detector = cv2.CascadeClassifier('deployment/haarcascade_frontalface_default.xml')
+import torch
+# detector = cv2.CascadeClassifier('deployment/haarcascade_frontalface_default.xml')
+
+def add_embedding(img_path, user_code):
+    ########################################################
+    new_name = str(user_code)
+    img = np.array(Image.open(img_path))
+    img_cropped_list = mtcnn(img, return_prob=False) 
+    new_emb = resnet(img_cropped_list.unsqueeze(0)).detach() 
+    data = [embedding_list.append(new_emb), name_list.append(new_name)] 
+    torch.save(data, 'deployment/assets/embeddings.pt') # saving data.pt file
+
 
 @st.cache
 def load_image(img):
@@ -57,13 +69,14 @@ def cannize_image(our_image):
     return canny
 
 
-def recognize():
-    '''dump example
+def main(img):
+    '''main function for recognizing people
     '''
-    return json.load(open("deployment/assets/info/3694679.json",'r'))
+    name = recognize(img)
+    return json.load(open(f"deployment/assets/info/{name}.json",'r'))
 
 
-def main():
+def app():
     """Face Recognition App"""
 
     st.title("Face Recognition App")
@@ -115,6 +128,9 @@ def main():
             }
             with open(user_info_path,'w') as f:
                 json.dump(user_info, f, indent=2)
+            
+            add_embedding(new_upload_path, user_code)
+            st.success(f"Upload : Successfully Saved Embedding!")
 
     if choice == 'Recognition':
         st.subheader("Face Recognition")
@@ -156,8 +172,7 @@ def main():
 
         if st.button("Process"):
             with st.spinner(text="🤖 Recognizing..."):
-                data = recognize()
-                time.sleep(0.1)
+                data = main(result)
                 st.write(data)
                 st.balloons()
 
@@ -194,4 +209,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    app()
