@@ -47,20 +47,16 @@ def check_fake(image_path, model_dir="face_anti_spoofing/FAS/resources/anti_spoo
 
     label = np.argmax(prediction)
     value = prediction[0][label]/2
+    if value <0.65:
+        if label == 0:
+            label = 1
+        elif label == 1:
+            label = 0
     if label == 1:
-        if value < 0.6:
-            result_text = "Might be a fake face. Change your position for another authentification attempt"
-            print(result_text)
-        else:
-            print("Image is Real Face. Score: {:.2f}.".format(value))
-            result_text = "RealFace Score: {:.2f}".format(value)
-
+        print("Image is Real Face. Score: {:.2f}.".format(value))
+        result_text = "RealFace Score: {:.2f}".format(value)
     else:
-        if value < 0.6:
-            result_text = "Might be a fake face. However, you have to change your position for another authentification attempt"
-            print(result_text)
-        else:
-            print("Image is Fake Face. Score: {:.2f}.".format(value))
-            result_text = "FakeFace Score: {:.2f}".format(value)
+        print("Image is Fake Face. Score: {:.2f}.".format(value))
+        result_text = "FakeFace Score: {:.2f}".format(value)
     print("Prediction cost {:.2f} s".format(test_speed))
     return result_text, label
