@@ -44,12 +44,11 @@ def keypoints_alignment(image, eye_coors):
     # image = cv2.circle(image, left_eye, 30, (255, 0, 0), 2)
     # image = cv2.circle(image, right_eye, 30, (255, 0, 0), 2)
     rotated_image = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC)
-    cv2.waitKey(0)
 
     return rotated_image
 
 
-def landmarks_align_image(image_path, points=None, demo=False):
+def landmarks_align_image(image_path, demo=False):
     fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, 
                                       device='cpu')
     image = cv2.imread(image_path)
@@ -79,9 +78,11 @@ def landmarks_align_image(image_path, points=None, demo=False):
         cv2.imwrite(image_path, face)
 
 
-def keypoints_align_image(image_path, points=None, demo=False):
+def keypoints_align_image(image_path, demo=False):
     image = cv2.imread(image_path)
-    coors = points
+    json_path = image_path.split('.')[0] + '.json'
+    with open(json_path, 'r') as f:
+        coors = json.load(f)
 
     face = keypoints_alignment(image, (coors[0], coors[1]))
     cv2.imwrite('data/demo/alignment/' + image_path.split('/')[-1], face)
@@ -90,11 +91,11 @@ def keypoints_align_image(image_path, points=None, demo=False):
         cv2.imwrite(image_path, face)
 
 
-def align_image(image_path, points=None, demo=False, t="keypoints"):
+def align_image(image_path, demo=False, t="keypoints"):
     if t == "keypoints":
-        keypoints_align_image(image_path, points, demo)
+        keypoints_align_image(image_path, demo)
     else:
-        landmarks_align_image(image_path, points, demo)
+        landmarks_align_image(image_path, demo)
 
 
 if __name__ == '__main__':
