@@ -18,7 +18,7 @@ from image_alignment.alignment import align_image
 from face_recognition.facenet.test import *
 from face_anti_spoofing.FAS.infer import check_fake
 import torch
-# detector = cv2.CascadeClassifier('deployment/haarcascade_frontalface_default.xml')
+detector = cv2.CascadeClassifier('deployment/haarcascade_frontalface_default.xml')
 
 
 @st.cache
@@ -187,7 +187,24 @@ def app():
 
         st.warning("NOTE : In order to use this mode, you need to give webcam access.")
 
-        spinner_message = "Wait a sec, getting some things done..."
+        spinner_message = "🤖 Wait a sec, getting some things done..."
+        minimum_neighbors = 4
+        # Minimum possible object size
+        min_object_size = (50, 50)
+        minimum_neighbors = st.slider("Mininum Neighbors", min_value=0, max_value=10,
+                                    help="Parameter specifying how many neighbors each candidate "
+                                        "rectangle should have to retain it. This parameter will affect "
+                                        "the quality of the detected faces. Higher value results in less "
+                                        "detections but with higher quality.",
+                                    value=minimum_neighbors)
+
+        # slider for choosing parameter values
+
+        min_size = st.slider(f"Mininum Object Size, Eg-{min_object_size} pixels ", min_value=3, max_value=500,
+                            help="Minimum possible object size. Objects smaller than that are ignored.",
+                            value=70)
+
+        min_object_size = (min_size, min_size)
         with st.spinner(spinner_message):
 
             class VideoProcessor:
@@ -198,13 +215,17 @@ def app():
                     frame = cv2.cvtColor(frame, 1)
 
                     # detect faces
-                    faces = yoloface_predict(frame, get_ax=True)
+                    # cut_faces, list_points, axes = yoloface_predict(frame, get_ax=True)
                     # faces = ssd_predict(frame, get_ax=True)
-                    # faces = detector.detectMultiScale(frame, 1.1, minNeighbors=minimum_neighbors, minSize=min_object_size)
+                    faces = detector.detectMultiScale(frame, 1.1, minNeighbors=minimum_neighbors, minSize=min_object_size)
 
                     # draw bounding boxes
-                    for x, y, w, h in faces:
+                    for i, (x, y, w, h) in enumerate(faces):
                         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
+                        # face = Image.fromarray(cut_faces[i])
+                        # info = main(face)
+                        info = main(frame)
+                        frame = cv2.putText(frame, info['name'], (int(x),int(y)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0),1, cv2.LINE_AA)
 
                     frame = av.VideoFrame.from_ndarray(frame, format="bgr24")
 

@@ -64,7 +64,3 @@ def check_fake(image_path, model_dir="face_anti_spoofing/FAS/resources/anti_spoo
             result_text = "FakeFace Score: {:.2f}".format(value)
     print("Prediction cost {:.2f} s".format(test_speed))
     return result_text, label
-
-    # format_ = os.path.splitext(image_name)[-1]
-    # result_image_name = image_name.replace(format_, "_result" + format_)
-    # cv2.imwrite(SAMPLE_IMAGE_PATH + result_image_name, image)
