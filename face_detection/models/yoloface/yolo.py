@@ -7,6 +7,8 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
+from thop import profile
+from thop import clever_format
 
 sys.path.append('./')  # to run '$ python *.py' files in subdirectories
 logger = logging.getLogger(__name__)
@@ -285,8 +287,6 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
     return nn.Sequential(*layers), sorted(save)
 
 
-from thop import profile
-from thop import clever_format
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--cfg', type=str, default='yolov5s.yaml', help='model.yaml')

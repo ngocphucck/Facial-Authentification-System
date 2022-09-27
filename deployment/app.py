@@ -15,8 +15,20 @@ from face_detection.predict import predict as detect
 from face_detection.predict import ssd_predict, yoloface_predict
 from image_enhacement.srgan.tools.predict import predict as enhance
 from image_alignment.alignment import align_image
+from face_recognition.facenet.test import *
 
-detector = cv2.CascadeClassifier('deployment/haarcascade_frontalface_default.xml')
+import torch
+# detector = cv2.CascadeClassifier('deployment/haarcascade_frontalface_default.xml')
+
+def add_embedding(img_path, user_code):
+    ########################################################
+    new_name = str(user_code)
+    img = np.array(Image.open(img_path))
+    img_cropped_list = mtcnn(img, return_prob=False) 
+    new_emb = resnet(img_cropped_list.unsqueeze(0)).detach() 
+    data = [embedding_list.append(new_emb), name_list.append(new_name)] 
+    torch.save(data, 'deployment/assets/embeddings.pt') # saving data.pt file
+
 
 @st.cache
 def load_image(img):
@@ -57,16 +69,17 @@ def cannize_image(our_image):
     return canny
 
 
-def verify():
-    '''dump example
+def main(img):
+    '''main function for recognizing people
     '''
-    return json.load(open("deployment/assets/target_imgs/20180134/20180134.json",'r'))
+    name = recognize(img)
+    return json.load(open(f"deployment/assets/info/{name}.json",'r'))
 
 
-def main():
-    """Face Verification App"""
+def app():
+    """Face Recognition App"""
 
-    st.title("Face Verification App")
+    st.title("Face Recognition App")
     st.text("Build with Streamlit & Deep learning algorithms")
 
     activities = ["About", "Upload", "Recognition", "Realtime Webcam Recognition"]
@@ -103,7 +116,7 @@ def main():
                 os.mkdir(user_folder)
             new_upload_path = os.path.join(user_folder, time.strftime("%Y%m%d%H%M%S.jpg"))
             cv2.imwrite(new_upload_path, cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR))
-            enhance(new_upload_path)
+            # enhance(new_upload_path)
             align_image(new_upload_path, points, demo=True)
             user_info_path = os.path.join(user_folder.replace(f"target_imgs\{user_code}", "info"), f"{user_code}.json")
             print(user_info_path)
@@ -115,9 +128,12 @@ def main():
             }
             with open(user_info_path,'w') as f:
                 json.dump(user_info, f, indent=2)
+            
+            add_embedding(new_upload_path, user_code)
+            st.success(f"Upload : Successfully Saved Embedding!")
 
     if choice == 'Recognition':
-        st.subheader("Face Identification")
+        st.subheader("Face Recognition")
         image = st.camera_input("Take a picture")
         if image is not None:
             image = Image.open(image)
@@ -156,8 +172,7 @@ def main():
 
         if st.button("Process"):
             with st.spinner(text="🤖 Recognizing..."):
-                data = verify()
-                time.sleep(0.1)
+                data = main(result)
                 st.write(data)
                 st.balloons()
 
@@ -166,18 +181,6 @@ def main():
         st.warning("NOTE : In order to use this mode, you need to give webcam access.")
 
         spinner_message = "Wait a sec, getting some things done..."
-        minimum_neighbors = st.slider("Mininum Neighbors", min_value=0, max_value=10,
-                                    help="Parameter specifying how many neighbors each candidate "
-                                        "rectangle should have to retain it. This parameter will affect "
-                                        "the quality of the detected faces. Higher value results in less "
-                                        "detections but with higher quality.",
-                                    value=4)
-
-        min_size = st.slider(f"Mininum Object Size, Eg-{(50, 50)} pixels ", min_value=3, max_value=500,
-                            help="Minimum possible object size. Objects smaller than that are ignored.",
-                            value=70)
-        min_object_size = (min_size, min_size)
-
         with st.spinner(spinner_message):
 
             class VideoProcessor:
@@ -206,4 +209,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    app()
