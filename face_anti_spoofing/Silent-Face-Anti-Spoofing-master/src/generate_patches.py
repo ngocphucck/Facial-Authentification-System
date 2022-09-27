@@ -4,7 +4,12 @@ Create patch from original input image by using bbox coordinate
 
 import cv2
 import numpy as np
-
+import argparse
+from src.anti_spoof_predict import Detection
+import tqdm
+import matplotlib.pyplot as plt
+import os
+from PIL import Image 
 
 class CropImage:
     @staticmethod
@@ -57,3 +62,33 @@ class CropImage:
                           left_top_x: right_bottom_x+1]
             dst_img = cv2.resize(img, (out_w, out_h))
         return dst_img
+
+org_img_dir = r"C:\Users\daidv8\Desktop\CV project\Facial-Authentification-System\face_anti_spoofing\Silent-Face-Anti-Spoofing-master\images\dai1.jpg"
+org_img = cv2.imread(org_img_dir)
+
+scale = [1.0, 2.7, 4.0]
+out_w, out_h = 80, 80
+detector = Detection()
+bbox = detector.get_bbox(org_img)
+cropper = CropImage()
+
+for idx, s in enumerate(scale):
+    dst_img = cropper.crop(org_img, bbox, s, out_w, out_h, crop=True)
+    img_rgb = cv2.cvtColor(dst_img, cv2.COLOR_BGR2RGB)
+    img = Image.fromarray(img_rgb)
+    temp = 0
+    if idx == 0:
+        direct = r"C:\Users\daidv8\Desktop\CV project\Facial-Authentification-System\face_anti_spoofing\Silent-Face-Anti-Spoofing-master\datasets\rgb_image\1_80x80\0"
+        filename = os.path.join("{}.jpg".format(temp))
+        img_name = os.path.join(direct, filename)
+        img.save(img_name)
+    elif idx==1:
+        direct = r"C:\Users\daidv8\Desktop\CV project\Facial-Authentification-System\face_anti_spoofing\Silent-Face-Anti-Spoofing-master\datasets\rgb_image\2.7_80x80\0"
+        filename = os.path.join("{}.jpg".format(temp))
+        img_name = os.path.join(direct, filename)
+        img.save(img_name)
+    elif idx==2:
+        direct = r"C:\Users\daidv8\Desktop\CV project\Facial-Authentification-System\face_anti_spoofing\Silent-Face-Anti-Spoofing-master\datasets\rgb_image\4_80x80\0"
+        filename = os.path.join("{}.jpg".format(temp))
+        img_name = os.path.join(direct, filename)
+        img.save(img_name)

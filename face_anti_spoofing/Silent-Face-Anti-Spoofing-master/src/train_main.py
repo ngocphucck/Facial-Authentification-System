@@ -17,6 +17,7 @@ class TrainMain:
         self.step = 0
         self.start_epoch = 0
         self.train_loader = get_train_loader(self.conf)
+        self.count = 0
 
     def train_model(self):
         self._init_model_param()
@@ -47,10 +48,13 @@ class TrainMain:
         is_first = True
         for e in range(self.start_epoch, self.conf.epochs):
             if is_first:
+                print(self.conf.log_path)
                 self.writer = SummaryWriter(self.conf.log_path)
                 is_first = False
             print('epoch {} started'.format(e))
             print("lr: ", self.schedule_lr.get_lr())
+            print(self.count)
+            self.count+=1
 
             for sample, ft_sample, target in tqdm(iter(self.train_loader)):
                 imgs = [sample, ft_sample]
