@@ -16,7 +16,7 @@ mtcnn = MTCNN(
 load_data = torch.load('deployment/assets/embeddings.pt') 
 embedding_list = load_data[0] 
 name_list = load_data[1] 
-
+print("LOADED EMBEDDING!")
 
 def recognize(img):
     if img is not None:

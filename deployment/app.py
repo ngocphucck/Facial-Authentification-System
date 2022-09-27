@@ -16,18 +16,9 @@ from face_detection.predict import ssd_predict, yoloface_predict
 from image_enhacement.srgan.tools.predict import predict as enhance
 from image_alignment.alignment import align_image
 from face_recognition.facenet.test import *
-
+from face_anti_spoofing.FAS.infer import check_fake
 import torch
 # detector = cv2.CascadeClassifier('deployment/haarcascade_frontalface_default.xml')
-
-def add_embedding(img_path, user_code):
-    ########################################################
-    new_name = str(user_code)
-    img = np.array(Image.open(img_path))
-    img_cropped_list = mtcnn(img, return_prob=False) 
-    new_emb = resnet(img_cropped_list.unsqueeze(0)).detach() 
-    data = [embedding_list.append(new_emb), name_list.append(new_name)] 
-    torch.save(data, 'deployment/assets/embeddings.pt') # saving data.pt file
 
 
 @st.cache
@@ -74,6 +65,16 @@ def main(img):
     '''
     name = recognize(img)
     return json.load(open(f"deployment/assets/info/{name}.json",'r'))
+
+
+def add_embedding(img_path, user_code):
+    ########################################################
+    new_name = str(user_code)
+    img = np.array(Image.open(img_path))
+    img_cropped_list = mtcnn(img, return_prob=False) 
+    new_emb = resnet(img_cropped_list.unsqueeze(0)).detach() 
+    data = [embedding_list.append(new_emb), name_list.append(new_name)] 
+    torch.save(data, 'deployment/assets/embeddings.pt') # saving data.pt file
 
 
 def app():
@@ -129,7 +130,13 @@ def app():
             with open(user_info_path,'w') as f:
                 json.dump(user_info, f, indent=2)
             
-            add_embedding(new_upload_path, user_code)
+            # text, result = check_fake(new_upload_path)
+            if 1:   
+                add_embedding(new_upload_path, user_code)
+                # st.warning(text)
+            else:
+                add_embedding(new_upload_path, user_code)
+                # st.warning(text)
             st.success(f"Upload : Successfully Saved Embedding!")
 
     if choice == 'Recognition':
