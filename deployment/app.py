@@ -122,7 +122,7 @@ def app():
             new_upload_path = os.path.join(user_folder, time.strftime("%Y%m%d%H%M%S.jpg"))
             cv2.imwrite(new_upload_path, cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR))
             # enhance(new_upload_path)
-            align_image(new_upload_path, points, demo=True)
+            # align_image(new_upload_path, points, demo=True)
             user_info_path = os.path.join(user_folder.replace(f"target_imgs\{user_code}", "info"), f"{user_code}.json")
             print(user_info_path)
             user_info = {
@@ -231,7 +231,6 @@ def app():
                     info, faces = main(frame, get_axes=True)
                     cv2.rectangle(frame, (int(faces[0]), int(faces[1])), (int(faces[2]), int(faces[3])), (0, 255, 0), 3)
                     frame = cv2.putText(frame, info['name'], (int(faces[0]),int(faces[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0),1, cv2.LINE_AA)
-
                     frame = av.VideoFrame.from_ndarray(frame, format="bgr24")
 
                     return frame
