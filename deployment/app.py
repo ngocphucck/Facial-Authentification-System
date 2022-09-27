@@ -60,11 +60,15 @@ def cannize_image(our_image):
     return canny
 
 
-def main(img):
+def main(img, get_axes=False):
     '''main function for recognizing people
     '''
-    name = recognize(img)
-    return json.load(open(f"deployment/assets/info/{name}.json",'r'))
+    if get_axes:
+        name, faces = recognize(img, get_axes=True)
+        return json.load(open(f"deployment/assets/info/{name}.json",'r')), faces[0]
+    else:
+        name = recognize(img)
+        return json.load(open(f"deployment/assets/info/{name}.json",'r'))
 
 
 def add_embedding(img_path, user_code):
@@ -74,7 +78,7 @@ def add_embedding(img_path, user_code):
     img_cropped_list = mtcnn(img, return_prob=False) 
     new_emb = resnet(img_cropped_list.unsqueeze(0)).detach() 
     data = [embedding_list.append(new_emb), name_list.append(new_name)] 
-    torch.save(data, 'deployment/assets/embeddings.pt') # saving data.pt file
+    torch.save(data, 'deployment/assets/embeddings.pt') # saving .pt file
 
 
 def app():
@@ -220,12 +224,13 @@ def app():
                     faces = detector.detectMultiScale(frame, 1.1, minNeighbors=minimum_neighbors, minSize=min_object_size)
 
                     # draw bounding boxes
-                    for i, (x, y, w, h) in enumerate(faces):
-                        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
+                    # for i, (x, y, w, h) in enumerate(faces):
+                    #     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
                         # face = Image.fromarray(cut_faces[i])
                         # info = main(face)
-                        info = main(frame)
-                        frame = cv2.putText(frame, info['name'], (int(x),int(y)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0),1, cv2.LINE_AA)
+                    info, faces = main(frame, get_axes=True)
+                    cv2.rectangle(frame, (int(faces[0]), int(faces[1])), (int(faces[2]), int(faces[3])), (0, 255, 0), 3)
+                    frame = cv2.putText(frame, info['name'], (int(faces[0]),int(faces[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0),1, cv2.LINE_AA)
 
                     frame = av.VideoFrame.from_ndarray(frame, format="bgr24")
 
