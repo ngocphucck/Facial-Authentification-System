@@ -57,16 +57,16 @@ def cannize_image(our_image):
     return canny
 
 
-def verify():
+def recognize():
     '''dump example
     '''
-    return json.load(open("deployment/assets/target_imgs/20180134/20180134.json",'r'))
+    return json.load(open("deployment/assets/info/3694679.json",'r'))
 
 
 def main():
-    """Face Verification App"""
+    """Face Recognition App"""
 
-    st.title("Face Verification App")
+    st.title("Face Recognition App")
     st.text("Build with Streamlit & Deep learning algorithms")
 
     activities = ["About", "Upload", "Recognition", "Realtime Webcam Recognition"]
@@ -103,7 +103,7 @@ def main():
                 os.mkdir(user_folder)
             new_upload_path = os.path.join(user_folder, time.strftime("%Y%m%d%H%M%S.jpg"))
             cv2.imwrite(new_upload_path, cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR))
-            enhance(new_upload_path)
+            # enhance(new_upload_path)
             align_image(new_upload_path, points, demo=True)
             user_info_path = os.path.join(user_folder.replace(f"target_imgs\{user_code}", "info"), f"{user_code}.json")
             print(user_info_path)
@@ -117,7 +117,7 @@ def main():
                 json.dump(user_info, f, indent=2)
 
     if choice == 'Recognition':
-        st.subheader("Face Identification")
+        st.subheader("Face Recognition")
         image = st.camera_input("Take a picture")
         if image is not None:
             image = Image.open(image)
@@ -156,7 +156,7 @@ def main():
 
         if st.button("Process"):
             with st.spinner(text="🤖 Recognizing..."):
-                data = verify()
+                data = recognize()
                 time.sleep(0.1)
                 st.write(data)
                 st.balloons()
@@ -166,18 +166,6 @@ def main():
         st.warning("NOTE : In order to use this mode, you need to give webcam access.")
 
         spinner_message = "Wait a sec, getting some things done..."
-        minimum_neighbors = st.slider("Mininum Neighbors", min_value=0, max_value=10,
-                                    help="Parameter specifying how many neighbors each candidate "
-                                        "rectangle should have to retain it. This parameter will affect "
-                                        "the quality of the detected faces. Higher value results in less "
-                                        "detections but with higher quality.",
-                                    value=4)
-
-        min_size = st.slider(f"Mininum Object Size, Eg-{(50, 50)} pixels ", min_value=3, max_value=500,
-                            help="Minimum possible object size. Objects smaller than that are ignored.",
-                            value=70)
-        min_object_size = (min_size, min_size)
-
         with st.spinner(spinner_message):
 
             class VideoProcessor:
