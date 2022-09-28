@@ -76,7 +76,7 @@ def add_embedding(img_path, user_code):
     new_name = str(user_code)
     img = np.array(Image.open(img_path))
     img_cropped_list = mtcnn(img, return_prob=False) 
-    new_emb = resnet(img_cropped_list.unsqueeze(0)).detach() 
+    new_emb = resnet(img_cropped_list.to(device).unsqueeze(0)).detach() 
     data = [embedding_list.append(new_emb), name_list.append(new_name)] 
     torch.save(data, 'deployment/assets/embeddings.pt') # saving .pt file
 
