@@ -16,18 +16,9 @@ from face_detection.predict import ssd_predict, yoloface_predict
 from image_enhacement.srgan.tools.predict import predict as enhance
 from image_alignment.alignment import align_image
 from face_recognition.facenet.test import *
-
+from face_anti_spoofing.FAS.infer import check_fake
 import torch
-# detector = cv2.CascadeClassifier('deployment/haarcascade_frontalface_default.xml')
-
-def add_embedding(img_path, user_code):
-    ########################################################
-    new_name = str(user_code)
-    img = np.array(Image.open(img_path))
-    img_cropped_list = mtcnn(img, return_prob=False) 
-    new_emb = resnet(img_cropped_list.unsqueeze(0)).detach() 
-    data = [embedding_list.append(new_emb), name_list.append(new_name)] 
-    torch.save(data, 'deployment/assets/embeddings.pt') # saving data.pt file
+detector = cv2.CascadeClassifier('deployment/haarcascade_frontalface_default.xml')
 
 
 @st.cache
@@ -69,11 +60,25 @@ def cannize_image(our_image):
     return canny
 
 
-def main(img):
+def main(img, get_axes=False):
     '''main function for recognizing people
     '''
-    name = recognize(img)
-    return json.load(open(f"deployment/assets/info/{name}.json",'r'))
+    if get_axes:
+        name, faces = recognize(img, get_axes=True)
+        return json.load(open(f"deployment/assets/info/{name}.json",'r')), faces[0]
+    else:
+        name = recognize(img)
+        return json.load(open(f"deployment/assets/info/{name}.json",'r'))
+
+
+def add_embedding(img_path, user_code):
+    ########################################################
+    new_name = str(user_code)
+    img = np.array(Image.open(img_path))
+    img_cropped_list = mtcnn(img, return_prob=False) 
+    new_emb = resnet(img_cropped_list.unsqueeze(0)).detach() 
+    data = [embedding_list.append(new_emb), name_list.append(new_name)] 
+    torch.save(data, 'deployment/assets/embeddings.pt') # saving .pt file
 
 
 def app():
@@ -117,7 +122,7 @@ def app():
             new_upload_path = os.path.join(user_folder, time.strftime("%Y%m%d%H%M%S.jpg"))
             cv2.imwrite(new_upload_path, cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR))
             # enhance(new_upload_path)
-            align_image(new_upload_path, points, demo=True)
+            # align_image(new_upload_path, points, demo=True)
             user_info_path = os.path.join(user_folder.replace(f"target_imgs\{user_code}", "info"), f"{user_code}.json")
             print(user_info_path)
             user_info = {
@@ -129,8 +134,15 @@ def app():
             with open(user_info_path,'w') as f:
                 json.dump(user_info, f, indent=2)
             
-            add_embedding(new_upload_path, user_code)
-            st.success(f"Upload : Successfully Saved Embedding!")
+            text, result = check_fake(new_upload_path)
+            if result:   
+                add_embedding(new_upload_path, user_code)
+                st.warning(text)
+                st.success(f"Upload : Successfully Saved Embedding!")
+
+            else:
+                # add_embedding(new_upload_path, user_code)
+                st.warning(text)
 
     if choice == 'Recognition':
         st.subheader("Face Recognition")
@@ -180,7 +192,24 @@ def app():
 
         st.warning("NOTE : In order to use this mode, you need to give webcam access.")
 
-        spinner_message = "Wait a sec, getting some things done..."
+        spinner_message = "🤖 Wait a sec, getting some things done..."
+        minimum_neighbors = 4
+        # Minimum possible object size
+        min_object_size = (50, 50)
+        minimum_neighbors = st.slider("Mininum Neighbors", min_value=0, max_value=10,
+                                    help="Parameter specifying how many neighbors each candidate "
+                                        "rectangle should have to retain it. This parameter will affect "
+                                        "the quality of the detected faces. Higher value results in less "
+                                        "detections but with higher quality.",
+                                    value=minimum_neighbors)
+
+        # slider for choosing parameter values
+
+        min_size = st.slider(f"Mininum Object Size, Eg-{min_object_size} pixels ", min_value=3, max_value=500,
+                            help="Minimum possible object size. Objects smaller than that are ignored.",
+                            value=70)
+
+        min_object_size = (min_size, min_size)
         with st.spinner(spinner_message):
 
             class VideoProcessor:
@@ -191,14 +220,18 @@ def app():
                     frame = cv2.cvtColor(frame, 1)
 
                     # detect faces
-                    faces = yoloface_predict(frame, get_ax=True)
+                    # cut_faces, list_points, axes = yoloface_predict(frame, get_ax=True)
                     # faces = ssd_predict(frame, get_ax=True)
-                    # faces = detector.detectMultiScale(frame, 1.1, minNeighbors=minimum_neighbors, minSize=min_object_size)
+                    faces = detector.detectMultiScale(frame, 1.1, minNeighbors=minimum_neighbors, minSize=min_object_size)
 
                     # draw bounding boxes
-                    for x, y, w, h in faces:
-                        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
-
+                    # for i, (x, y, w, h) in enumerate(faces):
+                    #     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
+                        # face = Image.fromarray(cut_faces[i])
+                        # info = main(face)
+                    info, faces = main(frame, get_axes=True)
+                    cv2.rectangle(frame, (int(faces[0]), int(faces[1])), (int(faces[2]), int(faces[3])), (0, 255, 0), 3)
+                    frame = cv2.putText(frame, info['name'], (int(faces[0]),int(faces[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0),1, cv2.LINE_AA)
                     frame = av.VideoFrame.from_ndarray(frame, format="bgr24")
 
                     return frame

@@ -16,9 +16,10 @@ mtcnn = MTCNN(
 load_data = torch.load('deployment/assets/embeddings.pt') 
 embedding_list = load_data[0] 
 name_list = load_data[1] 
+print("LOADED EMBEDDING!")
 
-
-def recognize(img):
+def recognize(img, get_axes=False):
+    name = "Unkown"
     if img is not None:
         img_cropped_list, prob_list = mtcnn(img, return_prob=True) 
         
@@ -38,6 +39,8 @@ def recognize(img):
                     min_dist = min(dist_list) # get minumum dist value
                     min_dist_idx = dist_list.index(min_dist) # get minumum dist index
                     name = name_list[min_dist_idx] # get name corrosponding to minimum dist
+        if get_axes:
+            return name, boxes
         return name
     return None
 

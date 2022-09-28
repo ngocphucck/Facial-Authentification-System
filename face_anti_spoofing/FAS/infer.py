@@ -1,18 +1,11 @@
 import os
-from turtle import width
 import cv2
 import numpy as np
-import argparse
 import warnings
 import time
 
-from src.anti_spoof_predict import AntiSpoofPredict
-from src.generate_patches import CropImage
-from src.utility import parse_model_name
+from face_anti_spoofing.FAS.src.anti_spoof_predict import AntiSpoofPredict
 warnings.filterwarnings('ignore')
-
-
-SAMPLE_IMAGE_PATH = "./images/"
 
 
 def check_image(image):
@@ -24,11 +17,11 @@ def check_image(image):
     else:
         return True
 
-def test(image_name, model_dir, device_id):
+
+def check_fake(image_path, model_dir="face_anti_spoofing/FAS/resources/anti_spoof_models", device_id=0):
     model_test = AntiSpoofPredict(device_id)
-    image = cv2.imread(SAMPLE_IMAGE_PATH + image_name)
+    image = cv2.imread(image_path)
     height, width, channel = image.shape
-    print(image.shape)
     # Resize the image to height/width = 4/3
     if height/width != 4/3:
         remain = height%4
@@ -45,7 +38,6 @@ def test(image_name, model_dir, device_id):
     test_speed = 0
     # sum the prediction from single model's result
     for model_name in os.listdir(model_dir):
-        h_input, w_input, model_type, scale = parse_model_name(model_name)
         dim = (80, 80)
         # resize image
         img_ = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
@@ -53,29 +45,18 @@ def test(image_name, model_dir, device_id):
         prediction += model_test.predict(img_, os.path.join(model_dir, model_name))
         test_speed += time.time()-start
 
-    print(img_.shape)
-    # draw result of prediction
     label = np.argmax(prediction)
     value = prediction[0][label]/2
+    if value <0.65:
+        if label == 0:
+            label = 1
+        elif label == 1:
+            label = 0
     if label == 1:
-        if value < 0.6:
-            result_text = "Might be a fake face. Change your position for another authentification attempt"
-            print(result_text)
-        else:
-            print("Image '{}' is Real Face. Score: {:.2f}.".format(image_name, value))
-            result_text = "RealFace Score: {:.2f}".format(value)
-
+        print("Image is Real Face. Score: {:.2f}.".format(value))
+        result_text = "RealFace Score: {:.2f}".format(value)
     else:
-        if value < 0.6:
-            result_text = "Might be a fake face. However, you have to change your position for another authentification attempt"
-            print(result_text)
-        else:
-            print("Image '{}' is Fake Face. Score: {:.2f}.".format(image_name, value))
-            result_text = "FakeFace Score: {:.2f}".format(value)
+        print("Image is Fake Face. Score: {:.2f}.".format(value))
+        result_text = "FakeFace Score: {:.2f}".format(value)
     print("Prediction cost {:.2f} s".format(test_speed))
-
-    format_ = os.path.splitext(image_name)[-1]
-    result_image_name = image_name.replace(format_, "_result" + format_)
-    cv2.imwrite(SAMPLE_IMAGE_PATH + result_image_name, image)
-
-test(image_name='phureal.jpg', model_dir="./resources/anti_spoof_models", device_id=0)
+    return result_text, label

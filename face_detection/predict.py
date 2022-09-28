@@ -99,7 +99,7 @@ def yoloface_predict(image_path, save_folder='data/demo/detection', get_ax=False
         cv2.imwrite(os.path.join(save_folder, str(j) + '.jpg'), cut_image)
     
     if get_ax:
-        return axes
+        return cut_faces, list_points, axes
     
     return cut_faces, list_points
 
