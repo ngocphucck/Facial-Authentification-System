@@ -21,9 +21,10 @@ print("LOADED EMBEDDING!")
 
 def recognize(img, get_axes=False):
     name = "Unkown"
+    boxes = None
+
     if img is not None:
         img_cropped_list, prob_list = mtcnn(img, return_prob=True) 
-        
         if img_cropped_list is not None:
             boxes, _ = mtcnn.detect(img)
                     
@@ -43,7 +44,7 @@ def recognize(img, get_axes=False):
         if get_axes:
             return name, boxes
         return name
-    return None
+    return None, None
 
 def test():
     camera=0

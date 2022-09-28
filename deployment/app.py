@@ -65,9 +65,13 @@ def main(img, get_axes=False):
     '''
     if get_axes:
         name, faces = recognize(img, get_axes=True)
+        if name == "Unknown":
+          return None, None
         return json.load(open(f"deployment/assets/info/{name}.json",'r')), faces[0]
     else:
         name = recognize(img)
+        if name == "Unknown":
+          return None
         return json.load(open(f"deployment/assets/info/{name}.json",'r'))
 
 
@@ -193,23 +197,7 @@ def app():
         st.warning("NOTE : In order to use this mode, you need to give webcam access.")
 
         spinner_message = "🤖 Wait a sec, getting some things done..."
-        minimum_neighbors = 4
-        # Minimum possible object size
-        min_object_size = (50, 50)
-        minimum_neighbors = st.slider("Mininum Neighbors", min_value=0, max_value=10,
-                                    help="Parameter specifying how many neighbors each candidate "
-                                        "rectangle should have to retain it. This parameter will affect "
-                                        "the quality of the detected faces. Higher value results in less "
-                                        "detections but with higher quality.",
-                                    value=minimum_neighbors)
 
-        # slider for choosing parameter values
-
-        min_size = st.slider(f"Mininum Object Size, Eg-{min_object_size} pixels ", min_value=3, max_value=500,
-                            help="Minimum possible object size. Objects smaller than that are ignored.",
-                            value=70)
-
-        min_object_size = (min_size, min_size)
         with st.spinner(spinner_message):
 
             class VideoProcessor:
@@ -222,7 +210,7 @@ def app():
                     # detect faces
                     # cut_faces, list_points, axes = yoloface_predict(frame, get_ax=True)
                     # faces = ssd_predict(frame, get_ax=True)
-                    faces = detector.detectMultiScale(frame, 1.1, minNeighbors=minimum_neighbors, minSize=min_object_size)
+                    # faces = detector.detectMultiScale(frame, 1.1, minNeighbors=minimum_neighbors, minSize=min_object_size)
 
                     # draw bounding boxes
                     # for i, (x, y, w, h) in enumerate(faces):
@@ -230,6 +218,8 @@ def app():
                         # face = Image.fromarray(cut_faces[i])
                         # info = main(face)
                     info, faces = main(frame, get_axes=True)
+                    if faces is None:
+                      return frame
                     cv2.rectangle(frame, (int(faces[0]), int(faces[1])), (int(faces[2]), int(faces[3])), (0, 255, 0), 3)
                     frame = cv2.putText(frame, info['name'], (int(faces[0]),int(faces[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0),1, cv2.LINE_AA)
                     frame = av.VideoFrame.from_ndarray(frame, format="bgr24")
@@ -238,8 +228,7 @@ def app():
 
             webrtc_streamer(key="key", video_processor_factory=VideoProcessor,
                             rtc_configuration=RTCConfiguration(
-                                {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}))
-
+                                {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}),  )
 
 if __name__ == '__main__':
     app()
