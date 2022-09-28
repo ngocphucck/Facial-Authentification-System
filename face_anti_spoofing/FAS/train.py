@@ -1,7 +1,7 @@
 import argparse
 import os
-from src.train_main import TrainMain
-from src.default_config import get_default_config, update_config
+from face_anti_spoofing.FAS.src.train_main import TrainMain
+from face_anti_spoofing.FAS.src.default_config import get_default_config, update_config
 
 
 def parse_args():
