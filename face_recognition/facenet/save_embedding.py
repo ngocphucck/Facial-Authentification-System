@@ -34,7 +34,7 @@ for img, idx in loader:
     img = img.to(device)
     face, prob = mtcnn(img, return_prob=True) 
     if face is not None and prob>0.92:
-        emb = resnet(face.unsqueeze(0)) 
+        emb = resnet(face.to(device).unsqueeze(0)) 
         embedding_list.append(emb.detach()) 
         name_list.append(idx_to_class[idx])        
 

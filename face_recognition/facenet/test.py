@@ -29,7 +29,7 @@ def recognize(img, get_axes=False):
                     
             for i, prob in enumerate([prob_list]):
                 if prob>0.90:
-                    emb = resnet(img_cropped_list.unsqueeze(0)).detach() 
+                    emb = resnet(img_cropped_list.to(device).unsqueeze(0)).detach() 
                     
                     dist_list = [] # list of matched distances, minimum distance is used to identify the person
                     
