@@ -21,8 +21,12 @@ def check_image(image):
 
 
 def check_fake(image_path, model_dir="face_anti_spoofing/FAS/resources/anti_spoof_models", device_id=0):
+    
     model_test = AntiSpoofPredict(device_id)
-    image = cv2.imread(image_path)
+    if type(image_path) == str:
+        image = cv2.imread(image_path)
+    else:
+        image = np.array(image_path)
     height, width, channel = image.shape
     # Resize the image to height/width = 4/3
     if height/width != 4/3:
@@ -56,9 +60,9 @@ def check_fake(image_path, model_dir="face_anti_spoofing/FAS/resources/anti_spoo
             label = 0
     if label == 1:
         print("Image is Real Face. Score: {:.2f}.".format(value))
-        result_text = "RealFace Score: {:.2f}".format(value)
+        result_text = "Real Score: {:.2f}".format(value)
     else:
         print("Image is Fake Face. Score: {:.2f}.".format(value))
-        result_text = "FakeFace Score: {:.2f}".format(value)
+        result_text = "Fake Score: {:.2f}".format(value)
     print("Prediction cost {:.2f} s".format(test_speed))
     return result_text, label

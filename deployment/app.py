@@ -139,7 +139,7 @@ def app():
                 json.dump(user_info, f, indent=2)
             
             text, result = check_fake(new_upload_path)
-            if result:   
+            if result==1:   
                 add_embedding(new_upload_path, user_code)
                 st.warning(text)
                 st.success(f"Upload : Successfully Saved Embedding!")
@@ -188,9 +188,14 @@ def app():
 
         if st.button("Process"):
             with st.spinner(text="🤖 Recognizing..."):
-                data = main(result)
-                st.write(data)
-                st.balloons()
+                text, label = check_fake(image)
+                if label==1:   
+                    st.success(text)
+                    data = main(result)
+                    st.write(data)
+                    st.balloons()
+                else:
+                    st.warning(text)
 
     elif choice == "Realtime Webcam Recognition":
 
