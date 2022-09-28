@@ -134,14 +134,15 @@ def app():
             with open(user_info_path,'w') as f:
                 json.dump(user_info, f, indent=2)
             
-            # text, result = check_fake(new_upload_path)
-            if 1:   
+            text, result = check_fake(new_upload_path)
+            if result:   
                 add_embedding(new_upload_path, user_code)
-                # st.warning(text)
+                st.warning(text)
+                st.success(f"Upload : Successfully Saved Embedding!")
+
             else:
-                add_embedding(new_upload_path, user_code)
-                # st.warning(text)
-            st.success(f"Upload : Successfully Saved Embedding!")
+                # add_embedding(new_upload_path, user_code)
+                st.warning(text)
 
     if choice == 'Recognition':
         st.subheader("Face Recognition")
