@@ -7,11 +7,12 @@ import sys
 sys.path.append(".")
 from PIL import Image
 
-resnet = InceptionResnetV1(pretrained='vggface2').eval().to('cpu')
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 mtcnn = MTCNN(
     image_size=160, margin=0, min_face_size=20,
     thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
-    device='cpu'
+    device=device
 )
 load_data = torch.load('deployment/assets/embeddings.pt') 
 embedding_list = load_data[0] 
@@ -55,6 +56,7 @@ def test():
             print("fail to grab frame, try again")
             break
         img = Image.fromarray(frame)
+        
         img_cropped_list, prob_list = mtcnn(img, return_prob=True) 
         
         if img_cropped_list is not None:

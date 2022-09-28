@@ -7,7 +7,8 @@ from image_enhacement.srgan.configs import config
 import image_enhacement.srgan.utils.utils as imgproc
 from image_enhacement.srgan.models.model import Generator
 
-model = Generator().to(device=config.device, memory_format=torch.channels_last)
+device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
+model = Generator().to(device=device, memory_format=torch.channels_last)
 # Load the super-resolution model weights
 checkpoint = torch.load(config.model_path, map_location=lambda storage, loc: storage)
 model.load_state_dict(checkpoint["state_dict"])

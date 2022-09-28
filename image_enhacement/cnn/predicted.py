@@ -5,9 +5,10 @@ from model import Net
 import numpy as np
 
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 upscale_factor = 3
-model = Net(upscale_factor)
-model = torch.load('model_epoch_10_Upscale_3.pth', map_location=torch.device('cpu'))
+model = Net(upscale_factor).to(device)
+model = torch.load('model_epoch_10_Upscale_3.pth', map_location=device)
 
 
 def predict(input_image,save_path):
@@ -15,7 +16,7 @@ def predict(input_image,save_path):
     y, cb, cr = img.split()
     img_to_tensor = ToTensor()
     
-    input = img_to_tensor(y).view(1, -1, y.size[1], y.size[0])
+    input = img_to_tensor(y).view(1, -1, y.size[1], y.size[0]).to(device)
     
     out = model(input)
     out = out.cpu()

@@ -3,11 +3,13 @@ import cv2
 import numpy as np
 import warnings
 import time
+import torch
 
 from face_anti_spoofing.FAS.src.anti_spoof_predict import AntiSpoofPredict
 warnings.filterwarnings('ignore')
 
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def check_image(image):
     height, width, channel = image.shape
     if width/height != 3/4:

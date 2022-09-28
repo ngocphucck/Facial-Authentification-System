@@ -21,7 +21,8 @@ warnings.filterwarnings("ignore")
 # net.load_state_dict(torch.load(trained_model_path, map_location=torch.device('cpu')))
 # net.eval()
 net = None
-model = YoloDetector(target_size=720, gpu=-1, min_face=90)
+device = 0 if torch.cuda.is_available() else -1
+model = YoloDetector(target_size=720, gpu=device, min_face=90)
 
 def ssd_predict(image_path, save_folder='data/demo/detection', get_ax=False):
     if type(image_path) == str:
@@ -36,9 +37,11 @@ def ssd_predict(image_path, save_folder='data/demo/detection', get_ax=False):
         
     transform = BaseTransform(net.size, (104, 117, 123))
 
-    x = torch.from_numpy(transform(image)[0]).permute(2, 0, 1)
+    x = torch.from_numpy(transform(image)[0]).permute(2, 0, 1).to('cuda' if device >= 0 else 'cpu')
     x = Variable(x.unsqueeze(0))
     y = net(x)
+    if torch.cuda.is_available():
+        y = y.detach().cpu()
     dets = y.data
     faces = []
     axes = []
@@ -74,8 +77,11 @@ def yoloface_predict(image_path, save_folder='data/demo/detection', get_ax=False
             image = np.array(image.convert('RGB'))
         image = cv2.cvtColor(image, 1)
 
-    x = torch.from_numpy(image).permute(2, 0, 1)
+    x = torch.from_numpy(image).permute(2, 0, 1).to('cuda' if device >= 0 else 'cpu')
     faces, points = model(image)
+    if torch.cuda.is_available():
+        faces = faces.detach().cpu()
+        points = points.detach().cpu()
     
     cut_faces = []
     list_points = []
