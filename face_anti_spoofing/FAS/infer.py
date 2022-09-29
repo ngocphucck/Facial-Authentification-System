@@ -26,7 +26,8 @@ def check_fake(image_path, model_dir="face_anti_spoofing/FAS/resources/anti_spoo
     if type(image_path) == str:
         image = cv2.imread(image_path)
     else:
-        image = np.array(image_path)
+        image = np.array(image_path.convert('RGB'))
+        # image = cv2.cvtColor(image, 1)
     height, width, channel = image.shape
     # Resize the image to height/width = 4/3
     if height/width != 4/3:

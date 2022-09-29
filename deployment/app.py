@@ -65,8 +65,8 @@ def main(img, get_axes=False):
     '''
     if get_axes:
         name, faces = recognize(img, get_axes=True)
-        if name == "Unknown":
-          return None, None
+        if name == "Unknown" or faces is None:
+          return {"name":name}, faces
         return json.load(open(f"deployment/assets/info/{name}.json",'r')), faces[0]
     else:
         name = recognize(img)
