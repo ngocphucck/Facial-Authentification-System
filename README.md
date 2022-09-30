@@ -1,5 +1,4 @@
 Facial Authentification System
-
 =====
 
 # Introduction
