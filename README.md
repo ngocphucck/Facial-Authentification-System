@@ -1,4 +1,5 @@
-Face-verification
+Facial Authentification System
+
 =====
 
 # Introduction
