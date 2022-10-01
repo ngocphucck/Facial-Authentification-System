@@ -5,7 +5,7 @@ Facial Authentification System
 
 This project aims to build a facial authentification app which includes face detection, face recognition, face anti-spoofing attacks and sentiment analysis to contribute to better authenticated system. The flow of this system is described in the following figure:
 
-![flow](https://user-images.githubusercontent.com/53470099/193404457-f3f0b163-5178-489c-8357-b838fa7dc9f4.png)
+<img width="667" alt="flow" src="https://user-images.githubusercontent.com/53470099/193404457-f3f0b163-5178-489c-8357-b838fa7dc9f4.png">
 
 # Usage
 ```bash
@@ -20,5 +20,5 @@ docker run app
 # References
 Thanks to some awesome works:
 
-- [mtcnn](https://github.com/timesler/facenet-pytorch)
-- [yolofacev5](https://github.com/elyha7/yoloface])
+- [MTCNN](https://github.com/timesler/facenet-pytorch)
+- [Yolofacev5](https://github.com/elyha7/yoloface])
