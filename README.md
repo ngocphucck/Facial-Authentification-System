@@ -15,7 +15,7 @@ docker build -t "app" .
 docker run app
 ```
 # Demo
-![demo (2)](https://user-images.githubusercontent.com/53470099/193184281-7ea17e9b-809a-4684-845a-4a92ffab7b43.gif)
+![demo](https://user-images.githubusercontent.com/53470099/193184281-7ea17e9b-809a-4684-845a-4a92ffab7b43.gif)
 
 # References
 Thanks to some awesome works:
